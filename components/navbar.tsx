@@ -11,9 +11,10 @@ export default function Navbar({ className }: { className?: string }) {
       >
       <Menu setActive={setActive}>
 
-        <MenuItem setActive={setActive} active={active} item="Home">
-          <HoveredLink href="/">Home</HoveredLink>
-        </MenuItem>
+        <HoveredLink href="/">
+            <MenuItem href="/" setActive={setActive} active={active} item="Home">
+            </MenuItem>
+        </HoveredLink>
 
         <MenuItem setActive={setActive} active={active} item="Our Offerings">
           <div className="  text-sm grid grid-cols-2 gap-10 p-4">
