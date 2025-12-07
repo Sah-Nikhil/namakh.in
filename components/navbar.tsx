@@ -21,13 +21,13 @@ export default function Navbar({ className }: { className?: string }) {
             <ProductItem
               title="Sports Blend"
               href="/shop/sports"
-              src="../assets/sports_logo.png"
+              src="/assets/sports_logo.png"
               description="FUEL. SWEAT. REPEAT."
             />
             <ProductItem
               title="Hydration Blend"
               href="/shop/hydration"
-              src="../assets/hydration_logo.png"
+              src="/assets/hydration_logo.png"
               description="PURE. DAILY. ESSENTIAL."
             />
           </div>

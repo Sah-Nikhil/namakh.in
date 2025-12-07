@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import type { Transition } from "framer-motion";
 import styles from "./Hero.module.css";
 
 const assets: { src: string; alt: string; width?: number; height?: number }[] = [
@@ -10,10 +11,15 @@ const assets: { src: string; alt: string; width?: number; height?: number }[] = 
 ];
 
 
-const fadeFlyIn = {
+const fadeFlyIn: {
+  initial: { opacity: number; y: number; filter: string };
+  animate: { opacity: number; y: number; filter: string };
+  transition: Transition;
+} = {
   initial: { opacity: 0, y: 24, filter: "blur(6px)" },
   animate: { opacity: 1, y: 0, filter: "blur(0px)" },
-  transition: { duration: 1.8, ease: [0.22, 1, 0.36, 1] },
+  // a safe transition typed as framer-motion's Transition
+  transition: { duration: 1.8, ease: ([0.22, 1, 0.36, 1] as unknown) as Transition["ease"] },
 };
 
 export default function Hero() {

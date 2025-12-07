@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
 import { motion } from "motion/react";
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 
 const transition = {
     type: "spring",
@@ -11,27 +11,40 @@ const transition = {
     stiffness: 100,
     restDelta: 0.001,
     restSpeed: 0.001,
-};
+} as const;
 
 export const MenuItem = ({
     setActive,
     active,
     item,
+    href,
     children,
     }: {
     setActive: (item: string) => void;
     active: string | null;
     item: string;
+    href?: string;
     children?: React.ReactNode;
     }) => {
     return (
         <div onMouseEnter={() => setActive(item)} className="relative ">
-        <motion.p
-            transition={{ duration: 0.3 }}
-            className="cursor-pointer text-white hover:opacity-[0.9]"
-        >
-            {item}
-        </motion.p>
+        {href ? (
+            <Link href={href} className="inline-block">
+                <motion.p
+                    transition={{ duration: 0.3 }}
+                    className="cursor-pointer text-white hover:opacity-[0.9]"
+                >
+                    {item}
+                </motion.p>
+            </Link>
+        ) : (
+            <motion.p
+                transition={{ duration: 0.3 }}
+                className="cursor-pointer text-white hover:opacity-[0.9]"
+            >
+                {item}
+            </motion.p>
+        )}
         {active !== null && (
             <motion.div
             initial={{ opacity: 0, scale: 0.85, y: 10 }}
@@ -104,7 +117,7 @@ export const ProductItem = ({
     }) => {
     return (
         <a href={href} className="flex space-x-2">
-        <img
+        <Image
             src={src}
             width={140}
             height={70}
@@ -123,13 +136,17 @@ export const ProductItem = ({
     );
 };
 
-export const HoveredLink = ({ children, ...rest }: any) => {
+export const HoveredLink = (
+    props: React.AnchorHTMLAttributes<HTMLAnchorElement> & { children?: React.ReactNode }
+) => {
+    const { children, className, ...rest } = props;
+    const mergedClassName = `${className ?? ""} text-neutral-200 hover:text-black`.trim();
     return (
         <a
-        {...rest}
-    className="text-neutral-200 hover:text-black "
+            {...(rest as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+            className={mergedClassName}
         >
-        {children}
+            {children}
         </a>
     );
 };
