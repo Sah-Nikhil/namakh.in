@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Navbar from "@/components/navbar";
+import MobileNav from "@/components/mobile-nav";
 import Footer from "@/components/ui/footer-modern";
 import Hero from "@/components/hero";
 import { BackgroundGradientAnimation } from "@/components/ui/background-gradient-animation";
@@ -14,6 +15,7 @@ export default function Home() {
     return (
         <div className="bg-white text-black min-h-screen font-sans selection:bg-blue-500/30">
             <Navbar onQuizClick={() => setIsQuizOpen(true)} />
+            <MobileNav onQuizClick={() => setIsQuizOpen(true)} />
 
             <QuizModal isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
 

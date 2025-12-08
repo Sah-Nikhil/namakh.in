@@ -7,7 +7,7 @@ export default function Navbar({ className, onQuizClick }: { className?: string;
   const [active, setActive] = useState<string | null>(null);
   return (
     <div
-      className={cn("fixed top-7 inset-x-0 max-w-4xl mx-auto z-[999]", className)}
+      className={cn("fixed top-7 inset-x-0 max-w-4xl mx-auto z-[999] hidden md:block", className)}
       >
       <Menu setActive={setActive}>
 
