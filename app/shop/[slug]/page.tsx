@@ -5,6 +5,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/lib/products";
 import Navbar from "@/components/navbar";
+import MobileNav from "@/components/mobile-nav";
 import Footer from "@/components/ui/footer-modern";
 import { motion } from "framer-motion";
 
@@ -32,9 +33,17 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
   return (
     <div className="bg-white text-neutral-900 min-h-screen font-sans selection:bg-blue-500/30">
       <Navbar />
+      <MobileNav />
 
-      <main className="pt-32 pb-20 px-4 md:px-8 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <main className="pt-6 md:pt-32 pb-20 px-4 md:px-8 max-w-7xl mx-auto">
+        {/* Mobile-only: Title and tagline at top */}
+        <div className="md:hidden mb-6">
+            <p className="text-blue-700 font-medium tracking-wider text-sm uppercase mb-2">Namakh Performance</p>
+            <h1 className="text-3xl font-bold text-neutral-900">{product.name}</h1>
+            <p className="text-lg text-neutral-700 mt-2 font-light">{product.tagline}</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
 
             {/* Left Column: Image Gallery Layout */}
             <div className="lg:col-span-7 flex flex-col-reverse md:flex-row gap-4">
@@ -79,8 +88,9 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
             </div>
 
             {/* Right Column: Product Details */}
-            <div className="lg:col-span-5 space-y-8">
-                <div>
+            <div className="lg:col-span-5 space-y-6 md:space-y-8">
+                {/* Desktop/tablet: Title (hidden on mobile since shown above) */}
+                <div className="hidden md:block">
                      <p className="text-blue-700 font-medium tracking-wider text-sm uppercase mb-2">Namakh Performance</p>
                      <h1 className="text-4xl md:text-5xl font-bold text-neutral-900">{product.name}</h1>
                      <p className="text-xl text-neutral-700 mt-2 font-light">{product.tagline}</p>

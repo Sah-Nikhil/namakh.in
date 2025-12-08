@@ -12,7 +12,7 @@ const audienceItems = [
 
 export default function ScienceSection() {
     return (
-        <section className="w-full py-24 px-4 bg-white relative overflow-hidden">
+        <section className="w-full py-16 px-4 bg-white relative overflow-hidden">
             <div className="max-w-5xl mx-auto text-center space-y-12 relative z-10">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -39,7 +39,7 @@ export default function ScienceSection() {
                     viewport={{ once: true }}
                     className="space-y-2 pt-12"
                 >
-                    <h1 className="text-2xl font-semibold tracking-[0.3em] text-blue-400 uppercase">Who is Namakh for?</h1>
+                    <h1 className="text-[1.4rem] font-semibold tracking-[0.3em] text-blue-400 uppercase">Who is Namakh for?</h1>
                 </motion.div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8">
                     {audienceItems.map((item, i) => (

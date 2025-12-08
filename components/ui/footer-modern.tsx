@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const Footer: React.FC = () => {
     return (
-        <footer className="bg-black text-white pt-12 pb-6 px- md:px-12">
+        <footer className="bg-black text-white pt-12 pb-24 md:pb-6 px-4 md:px-12">
             <div className="max-w-[90rem] mx-auto flex flex-col md:flex-row items-start md:items-start gap-6 md:gap-0 border-b border-gray-700 pb-4">
                 {/* Logo */}
                 <div className="flex flex-col justify-start items-start min-w-[120px] mr-12">
@@ -20,9 +20,9 @@ const Footer: React.FC = () => {
                     </div>
                 </div>
                 {/* Columns */}
-                <div className="flex flex-1 flex-row justify-between w-full">
+                <div className="flex flex-1 flex-wrap gap-6 md:flex-row md:justify-between w-full">
                     {/* About */}
-                    <div className="flex flex-col gap-2 min-w-[150px]">
+                    <div className="flex flex-col gap-2 min-w-[100px] md:min-w-[150px]">
                         <h4 className="font-semibold mb-2">About</h4>
                         <ul className="space-y-1 text-gray-300">
                             {/* <li><Link href="#" className="hover:text-white">Our Story</Link></li> */}
@@ -32,7 +32,7 @@ const Footer: React.FC = () => {
                         </ul>
                     </div>
                     {/* Shop */}
-                    <div className="flex flex-col gap-2 min-w-[150px]">
+                    <div className="flex flex-col gap-2 min-w-[100px] md:min-w-[150px]">
                         <h4 className="font-semibold mb-2">Shop</h4>
                         <ul className="space-y-1 text-gray-300">
                             {/* <li><Link href="#" className="hover:text-white">Shop All</Link></li> */}
@@ -42,7 +42,7 @@ const Footer: React.FC = () => {
                         </ul>
                     </div>
                     {/* Resources */}
-                    <div className="flex flex-col gap-2 min-w-[150px]">
+                    <div className="flex flex-col gap-2 min-w-[100px] md:min-w-[150px]">
                         <h4 className="font-semibold mb-2">Resources</h4>
                         <ul className="space-y-1 text-gray-300">
                             {/* <li><Link href="#" className="hover:text-white">Sign In</Link></li> */}
@@ -53,8 +53,8 @@ const Footer: React.FC = () => {
                         </ul>
                     </div>
                     {/* Newsletter & Socials */}
-                    <div className="flex flex-col gap-2 min-w-[220px]">
-                        <div className="flex items-center">
+                    <div className="flex flex-col gap-2 w-full md:min-w-[220px] md:w-auto mt-4 md:mt-0">
+                        <div className="flex items-center flex-wrap">
                             <span className="font-semibold mt-1">Want the latest from</span>
                             <span className="inline-block align-middle mx-2">
                                 <Image
