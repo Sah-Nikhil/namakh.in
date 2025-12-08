@@ -92,11 +92,11 @@ const Footer: React.FC = () => {
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center pt-6 text-xs text-gray-400">
                 <div className="mb-2 md:mb-0">© {new Date().getFullYear()} NAMAKH, INC.</div>
                 <div className="flex flex-wrap gap-4">
-                    <Link href="#" className="hover:text-white">Form C-AR Filing</Link>
+                    {/* <Link href="#" className="hover:text-white">Form C-AR Filing</Link> */}
                     <Link href="#" className="hover:text-white">Refunds & Returns</Link>
-                    <Link href="#" className="hover:text-white">Privacy Policy</Link>
+                    {/* <Link href="#" className="hover:text-white">Privacy Policy</Link> */}
                     <Link href="#" className="hover:text-white">Terms of Use</Link>
-                    <Link href="#" className="hover:text-white">Accessibility</Link>
+                    {/* <Link href="#" className="hover:text-white">Accessibility</Link> */}
                 </div>
             </div>
         </footer>
