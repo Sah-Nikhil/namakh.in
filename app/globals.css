@@ -4,7 +4,6 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-
   --animate-first: moveVertical 30s ease infinite;
   --animate-second: moveInCircle 20s reverse infinite;
   --animate-third: moveInCircle 40s linear infinite;

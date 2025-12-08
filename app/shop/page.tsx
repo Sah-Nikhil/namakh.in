@@ -1,85 +1,69 @@
-"use client";
-
-import React, { useState } from "react";
+import Link from "next/link";
 import Image from "next/image";
+import { products } from "@/lib/products";
+import Navbar from "@/components/navbar";
+import Footer from "@/components/ui/footer-modern";
 
-const images = [
-  "/assets/mockup.png",
-  "/assets/mockup2.png",
-  "/assets/hydration_pack.png",
-  "/assets/sports_pack.png",
-];
-
-export default function ShopPage() {
-  const [mainIdx, setMainIdx] = useState(0);
-
+export default function ShopIndex() {
   return (
-    <main className="min-h-screen px-6 py-10">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left: gallery */}
-        <div className="lg:col-span-7 flex gap-4">
-          <div className="hidden md:flex flex-col gap-3 w-20">
-            {images.map((src, i) => (
-              <button
-                key={src}
-                onClick={() => setMainIdx(i)}
-                className={`rounded border overflow-hidden p-1 bg-white/5 hover:scale-105 transition-transform ${
-                  i === mainIdx ? "ring-2 ring-offset-2 ring-black/40" : ""
-                }`}
-              >
-                <Image src={src} alt={`thumb-${i}`} width={72} height={96} className="object-cover" />
-              </button>
-            ))}
-          </div>
+    <div className="bg-black min-h-screen text-white font-sans">
+      <Navbar />
 
-          <div className="flex-1 bg-white/5 rounded overflow-hidden flex items-center justify-center">
-            <Image src={images[mainIdx]} alt="main" width={900} height={900} className="object-contain" />
-          </div>
+      <main className="pt-32 pb-20 px-4 max-w-7xl mx-auto">
+        <div className="text-center mb-20 space-y-4">
+            <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-white/40">
+            The Collection
+            </h1>
+            <p className="text-xl text-zinc-400 max-w-2xl mx-auto">
+                Precision-formulated electrolytes for every lifestyle. Find your perfect balance.
+            </p>
         </div>
 
-        {/* Right: product info */}
-        <aside className="lg:col-span-5">
-          <h2 className="text-2xl font-semibold">Double Cuff Olive Shirt</h2>
-          <p className="mt-2 text-lg font-medium">₹999</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+          {products.map((product) => (
+            <Link
+                key={product.id}
+                href={`/shop/${product.slug}`}
+                className="group relative bg-zinc-900/30 border border-white/10 rounded-3xl overflow-hidden hover:border-white/20 transition-all duration-500"
+            >
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/80 z-10" />
 
-          <div className="mt-6">
-            <h3 className="text-xs uppercase tracking-wide text-muted-foreground">Colors</h3>
-            <div className="mt-2 flex gap-3 flex-wrap">
-              {/* Example color swatches using small images */}
-              {images.slice(0, 4).map((src, i) => (
-                <button key={src} className="w-12 h-12 rounded border flex items-center justify-center overflow-hidden">
-                  <Image src={src} alt={`color-${i}`} width={48} height={48} className="object-cover" />
-                </button>
-              ))}
-            </div>
-          </div>
+              <div className="relative h-[500px] w-full p-8 flex items-center justify-center bg-zinc-950">
+                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                 <Image
+                    src={product.image}
+                    alt={product.name}
+                    width={400}
+                    height={400}
+                    className="object-contain z-0 group-hover:scale-110 transition-transform duration-700 ease-out"
+                 />
+              </div>
 
-          <div className="mt-6">
-            <h3 className="text-xs uppercase tracking-wide text-muted-foreground">Sizes</h3>
-            <div className="mt-2 flex gap-2">
-              {['S','M','L','XL','XXL'].map(s => (
-                <button key={s} className="px-3 py-2 border rounded text-sm">{s}</button>
-              ))}
-            </div>
-          </div>
+              <div className="absolute bottom-0 left-0 right-0 p-8 z-20 space-y-2">
+                <div className="flex justify-between items-end">
+                    <div>
+                        <h2 className="text-3xl font-bold group-hover:text-blue-400 transition-colors">{product.name}</h2>
+                        <p className="text-zinc-400 mt-1 line-clamp-1">{product.tagline}</p>
+                    </div>
+                    <div className="text-xl font-semibold bg-white/10 px-4 py-1 rounded-full backdrop-blur-md">
+                        ₹{product.price}
+                    </div>
+                </div>
 
-          <div className="mt-6">
-            <button className="w-full bg-black text-white py-3 rounded font-semibold">Add to Bag</button>
-          </div>
+                <div className="pt-4 flex gap-2 overflow-hidden">
+                    {product.features.slice(0, 2).map((feat, i) => (
+                        <span key={i} className="text-xs px-3 py-1 rounded-full border border-white/10 bg-black/50 text-zinc-300">
+                            {feat}
+                        </span>
+                    ))}
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </main>
 
-          <div className="mt-8 space-y-4">
-            <details className="border rounded p-4">
-              <summary className="font-medium">Details</summary>
-              <p className="mt-2 text-sm text-muted-foreground">A comfortable, stylish shirt with double cuffs.</p>
-            </details>
-
-            <details className="border rounded p-4">
-              <summary className="font-medium">Reviews</summary>
-              <p className="mt-2 text-sm text-muted-foreground">4.5 ★ — 5413 Ratings</p>
-            </details>
-          </div>
-        </aside>
-      </div>
-    </main>
+      <Footer />
+    </div>
   );
 }
