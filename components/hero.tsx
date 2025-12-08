@@ -23,7 +23,8 @@ const fadeFlyIn: {
 };
 
 export default function Hero() {
-  const strip = [...assets, ...assets];
+  // Duplicate assets 4x so next set queues as soon as last image enters viewport
+  const strip = [...assets, ...assets, ...assets, ...assets];
 
   return (
     <section className={styles.hero}>

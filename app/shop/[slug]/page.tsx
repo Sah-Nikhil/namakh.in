@@ -3,7 +3,7 @@
 import React, { useState, use } from "react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { products, getProductBySlug } from "@/lib/products";
+import { getProductBySlug } from "@/lib/products";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/ui/footer-modern";
 import { motion } from "framer-motion";

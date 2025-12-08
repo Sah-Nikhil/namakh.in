@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { Menu, MenuItem, ProductItem } from "@/components/ui/navbar-menu";
 import { cn } from "@/lib/utils";
-import Link from "next/link";
 
 export default function Navbar({ className, onQuizClick }: { className?: string; onQuizClick?: () => void }) {
   const [active, setActive] = useState<string | null>(null);
