@@ -10,7 +10,7 @@ export const BackgroundGradientAnimation = ({
   thirdColor = "180, 205, 255",
   fourthColor = "210, 225, 255",
   fifthColor = "100, 150, 230",
-  pointerColor = "140, 100, 255",
+  pointerColor = "103, 100, 255",
   size = "80%",
   blendingValue = "hard-light",
   children,
