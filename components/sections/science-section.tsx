@@ -20,7 +20,7 @@ export default function ScienceSection() {
                     viewport={{ once: true }}
                     className="space-y-6"
                 >
-                    <h2 className="text-sm font-semibold tracking-[0.3em] text-blue-400 uppercase">🧠 The Science Behind Namakh</h2>
+                    <h2 className="text-sm font-semibold tracking-[0.3em] text-blue-400 uppercase">The Science Behind Namakh</h2>
                     <p className="text-3xl md:text-5xl font-bold leading-tight">
                         &ldquo;When you hydrate right, you think sharper, perform better, and recover faster.&rdquo;
                     </p>

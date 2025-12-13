@@ -17,7 +17,7 @@ export default function RootedSection() {
                 </div>
 
                 <div className="space-y-6">
-                    <h2 className="text-sm font-semibold tracking-[0.3em] text-orange-400 uppercase">🇮🇳 Rooted in India. Made for the World.</h2>
+                    <h2 className="text-sm font-semibold tracking-[0.3em] text-orange-400 uppercase">Rooted in India 🇮🇳. Made for the World.</h2>
                     <h3 className="text-4xl md:text-6xl font-bold">
                         Salt. The essence of balance.
                     </h3>
