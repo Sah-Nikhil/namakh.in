@@ -11,8 +11,8 @@ export default function ProductCTASection({ onQuizClick }: ProductCTASectionProp
         <section className="w-full pt-16 pb-24 px-4 bg-white">
             <div className="max-w-4xl mx-auto text-center space-y-12">
                 <div className="space-y-4">
-                    <h2 className="text-5xl md:text-7xl font-bold">Hydrate smarter, not harder.</h2>
-                    <p className="text-xl text-neutral-600">Find your perfect blend today.</p>
+                    <h2 className="text-5xl md:text-7xl font-bold">Find your perfect blend today.</h2>
+                    {/* <p className="text-xl text-neutral-600"></p> */}
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-8">
