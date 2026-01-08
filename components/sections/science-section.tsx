@@ -3,12 +3,7 @@
 import { motion } from "framer-motion";
 import NMKGraph from "../graph";
 
-const audienceItems = [
-    { icon: "🏃‍♂", label: "Athletes\n& Lifters" },
-    { icon: "🌞", label: "Heat & Humid\nClimates" },
-    { icon: "🧘", label: "Everyday\nWellness" },
-    { icon: "💼", label: "Work\n& Travel" },
-];
+
 
 export default function ScienceSection() {
     return (
@@ -33,22 +28,6 @@ export default function ScienceSection() {
 
                 </motion.div>
 
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="space-y-2 pt-12"
-                >
-                    <h1 className="text-[1.4rem] font-semibold tracking-[0.3em] text-blue-400 uppercase">Who is Namakh for?</h1>
-                </motion.div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8">
-                    {audienceItems.map((item, i) => (
-                        <div key={i} className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-black/5 border border-black/10 hover:bg-black/10 transition-colors">
-                            <span className="text-4xl">{item.icon}</span>
-                            <span className="text-sm font-medium text-neutral-600 whitespace-pre-line">{item.label}</span>
-                        </div>
-                    ))}
-                </div>
 
             </div>
         </section>

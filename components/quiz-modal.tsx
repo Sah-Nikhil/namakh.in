@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronRight, Check } from "lucide-react";
+import { X, ChevronRight, Check, DivideCircle } from "lucide-react";
 import Link from "next/link";
 
 interface QuizOption {
@@ -23,10 +23,11 @@ const questions: Question[] = [
     id: 1,
     question: "How active are you on most days?",
     options: [
-      { label: "🧘 I mostly walk, do yoga, or light workouts.", value: "light", score: { hydration: 2, sports: 0 } },
+      { label: "🧘 I mostly walk, do yoga, or light workouts.", value: "light", score: { hydration: 2, sports: 1 } },
       { label: "🚴 I train moderately 3–5 times a week.", value: "moderate", score: { hydration: 1, sports: 1 } },
       { label: "🏋 I do intense workouts or sports daily.", value: "intense", score: { hydration: 0, sports: 2 } },
       { label: "😅 I work outdoors or sweat a lot even without workouts.", value: "sweat", score: { hydration: 0, sports: 2 } },
+      { label: "Desk Jockey", value: "None", score: { hydration: 2, sports: 0 } },
     ],
   },
   {
@@ -48,6 +49,7 @@ const questions: Question[] = [
       { label: "☀ Morning / throughout the day", value: "morning", score: { hydration: 2, sports: 0 } },
       { label: "🏃 Before or during workouts", value: "workout", score: { hydration: 0, sports: 2 } },
       { label: "💤 After training / before bed", value: "night", score: { hydration: 1, sports: 1 } },
+      { label: "No Preference", value: "none", score: { hydration: 0, sports: 0 } },
     ],
   },
   {
@@ -309,7 +311,10 @@ export default function QuizModal({ isOpen, onClose }: { isOpen: boolean; onClos
 
         {/* Footer (Navigation) */}
         {!result && (
-          <div className="p-6 border-t border-black/10 bg-white/50 flex justify-end">
+          <div className="p-6 border-t border-black/10 bg-white/50 flex justify-between">
+                {/* <div className="flex items-center gap-2 text-black px-6 py-3 rounded-full font-light  disabled:opacity-50 disabled:cursor-not-allowed transition-all italic">
+                Choose one or more options
+                </div> */}
             {questions[currentStep].multiSelect && (
                 <button
                 onClick={() => handleNext()}

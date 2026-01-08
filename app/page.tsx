@@ -31,8 +31,16 @@ export default function Home() {
                 </BackgroundGradientAnimation>
 
 
-                <ScienceSection />
+                <section className="w-full pt-16 pb-24 px-4 bg-white">
+                    <div className="max-w-4xl mx-auto text-center space-y-12">
+                        <div className="space-y-4">
+                            <h2 className="text-5xl md:text-7xl font-bold">Hydrate smarter, not harder.</h2>
+                            </div>
+                    </div>
+                </section>
+
                 <RootedSection />
+                <ScienceSection />
                 <ProductCTASection onQuizClick={() => setIsQuizOpen(true)} />
 
             </div>

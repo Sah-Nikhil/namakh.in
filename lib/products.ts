@@ -9,8 +9,9 @@ export type Product = {
     sodium: number; // mg
     potassium: number; // mg
     magnesium: number; // mg
-    sugar: number; // g
     dextrose?: number; // g
+    glycine?: number; // mg
+    citricAcid?: number; // mg
   };
   features: string[];
   image: string;
@@ -31,7 +32,9 @@ export const products: Product[] = [
       sodium: 600,
       potassium: 400,
       magnesium: 60,
-      sugar: 0,
+      dextrose: 0,
+      glycine: 500,
+      citricAcid: 100,
     },
     features: [
       "Zero Sugar",
@@ -54,8 +57,9 @@ export const products: Product[] = [
       sodium: 1000,
       potassium: 600,
       magnesium: 100,
-      sugar: 3,
       dextrose: 3,
+      glycine: 500,
+      citricAcid: 180,
     },
     features: [
       "3g Dextrose for quick energy",

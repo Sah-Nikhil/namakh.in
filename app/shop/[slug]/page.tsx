@@ -117,7 +117,15 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                     </div>
                      <div className="space-y-1">
                         <p className="text-sm text-neutral-600">Sugar</p>
-                        <p className="text-xl font-bold">{product.stats.sugar} g</p>
+                        <p className="text-xl font-bold">{product.stats.dextrose} g</p>
+                    </div>
+                    <div className="space-y-1">
+                        <p className="text-sm text-neutral-600">Glycine</p>
+                        <p className="text-xl font-bold">{product.stats.glycine} mg</p>
+                    </div>
+                    <div className="space-y-1">
+                        <p className="text-sm text-neutral-600">Citric Acid</p>
+                        <p className="text-xl font-bold">{product.stats.citricAcid} mg</p>
                     </div>
                 </div>
 
@@ -129,27 +137,14 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                     <button className="w-full bg-neutral-900 text-white py-4 rounded-full font-bold text-lg hover:bg-neutral-700 transition-colors">
                         Add to Cart — ₹{product.price}
                     </button>
-                    <p className="text-center text-xs text-neutral-600">
+                    {/* <p className="text-center text-xs text-neutral-600">
                         Free shipping on all orders above ₹500. Secure checkout.
-                    </p>
+                    </p> */}
                 </div>
 
                 {/* Simple Accordions for Details */}
                 <div className="space-y-4 pt-8">
                     <details className="group border-b border-neutral-200 pb-4">
-                        <summary className="flex justify-between items-center cursor-pointer list-none text-neutral-800 font-medium group-hover:text-neutral-900">
-                            <span>Ingredients & Nutritional Info</span>
-                            <span className="group-open:rotate-180 transition-transform">▼</span>
-                        </summary>
-                         <div className="pt-4 text-neutral-700 text-sm space-y-2">
-                            <p>Full spectrum electrolyte profile tailored for {product.name.includes("Sports") ? "heavy sweating and endurance" : "daily balance"}.</p>
-                            <div className="relative h-64 w-full bg-neutral-100 rounded-lg overflow-hidden mt-4">
-                                <Image src={product.nutritionalLabel} alt="Nutrition Label" fill className="object-contain" />
-                            </div>
-                         </div>
-                    </details>
-
-                     <details className="group border-b border-neutral-200 pb-4">
                         <summary className="flex justify-between items-center cursor-pointer list-none text-neutral-800 font-medium group-hover:text-neutral-900">
                             <span>How to Use</span>
                             <span className="group-open:rotate-180 transition-transform">▼</span>
@@ -165,6 +160,22 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                             : "Best consumed first thing in the morning or during travel/work."}
                          </div>
                     </details>
+                    
+                    <details className="group border-b border-neutral-200 pb-4">
+                        <summary className="flex justify-between items-center cursor-pointer list-none text-neutral-800 font-medium group-hover:text-neutral-900">
+                            <p>Ingredients Info (Stats for Nerds) </p>
+                            <span className="group-open:rotate-180 transition-transform">▼</span>
+                        </summary>
+                        {/* To be Updated @ Chirrag */}
+                         <div className="pt-4 text-neutral-700 text-sm space-y-2">
+                            <p>Full spectrum electrolyte profile tailored for {product.name.includes("Sports") ? "heavy sweat    and endurance" : "daily balance"}.</p>
+                            <div className="relative h-64 w-full bg-neutral-100 rounded-lg overflow-hidden mt-4">
+                                <Image src={product.nutritionalLabel} alt="Nutrition Label" fill className="object-contain" />
+                            </div>
+                         </div>
+                    </details>
+
+
                 </div>
 
             </div>

@@ -1,6 +1,21 @@
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 export default function RootedSection() {
+    const audienceItems = [
+    { icon: "🏃‍♂", label: "Athletes\n& Lifters" },
+    { icon: "🌞", label: "Heat & Humid\nClimates" },
+    { icon: "🧘", label: "Everyday\nWellness" },
+    { icon: "💼", label: "Work\n& Travel" },
+];
+    function Flag() {
+        return (
+            <span className="md:hidden" role="img" aria-label="India Flag">
+                🇮🇳
+            </span>
+            );
+    }
+
     return (
         <section className="w-full py-6 px-4 bg-neutral-100/25 relative">
             <div className="absolute inset-0 bg-[url('/assets/grain.png')] opacity-10 pointer-events-none mix-blend-multiply"></div>
@@ -17,7 +32,7 @@ export default function RootedSection() {
                 </div>
 
                 <div className="space-y-6">
-                    <h2 className="text-sm font-semibold tracking-[0.3em] text-orange-400 uppercase">Rooted in India 🇮🇳. Made for the World.</h2>
+                    <h2 className="text-sm font-semibold tracking-[0.3em] text-orange-400 uppercase">Rooted in India {Flag()}. Made for the World.</h2>
                     <h3 className="text-4xl md:text-6xl font-bold">
                         Salt. The essence of balance.
                     </h3>
@@ -40,6 +55,25 @@ export default function RootedSection() {
                     </p>
                 </div>
             </div>
+            <div className="max-w-5xl mx-auto text-center space-y-12 relative z-10">
+            <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="space-y-2 pt-12"
+                >
+                    <h1 className="text-[1.4rem] font-semibold tracking-[0.3em] text-blue-400 uppercase">Who is Namakh for?</h1>
+                </motion.div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8">
+                    {audienceItems.map((item, i) => (
+                        <div key={i} className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-black/5 border border-black/10 hover:bg-black/10 transition-colors">
+                            <span className="text-4xl">{item.icon}</span>
+                            <span className="text-sm font-medium text-neutral-600 whitespace-pre-line">{item.label}</span>
+                        </div>
+                    ))}
+                </div>
+                </div>
         </section>
     );
 }
