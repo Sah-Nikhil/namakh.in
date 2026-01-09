@@ -1,14 +1,19 @@
 "use client";
 import React, { useState } from "react";
+import { motion, useTransform, MotionValue } from "framer-motion";
 import { Menu, MenuItem, ProductItem } from "@/components/ui/navbar-menu";
 import { cn } from "@/lib/utils";
 
-export default function Navbar({ className, onQuizClick }: { className?: string; onQuizClick?: () => void }) {
+export default function Navbar({ className, onQuizClick, scrollY }: { className?: string; onQuizClick?: () => void; scrollY: MotionValue<number> }) {
   const [active, setActive] = useState<string | null>(null);
+  // Scroll-based transforms
+  const opacity = useTransform(scrollY, [250, 350], [0, 1]);
+  const y = useTransform(scrollY, [250, 350], [-20, 0]);
   return (
-    <div
+    <motion.div
+      style={{ opacity, y }}
       className={cn("fixed top-7 inset-x-0 max-w-4xl mx-auto z-[999] hidden md:block", className)}
-      >
+    >
       <Menu setActive={setActive}>
 
             <MenuItem href="/" setActive={setActive} active={null} item="Home">
@@ -45,6 +50,6 @@ export default function Navbar({ className, onQuizClick }: { className?: string;
         </button>
 
       </Menu>
-    </div>
+    </motion.div>
   );
 }
