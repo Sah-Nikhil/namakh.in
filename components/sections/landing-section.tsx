@@ -1,8 +1,12 @@
 "use client"
 
-import { motion, useTransform } from 'framer-motion'
+import { motion, useTransform, MotionValue } from 'framer-motion'
 
-export default function LandingSection({ scrollY }) {
+interface LandingSectionProps {
+  scrollY: MotionValue<number>;
+}
+
+export default function LandingSection({ scrollY }: LandingSectionProps) {
   // Transform logo size and position based on scroll
   const logoScale = useTransform(scrollY, [0, 300], [1, 0.15])
   const logoY = useTransform(scrollY, [0, 300], [0, -45])
