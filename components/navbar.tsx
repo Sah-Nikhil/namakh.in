@@ -39,7 +39,7 @@ export default function Navbar({ className, onQuizClick, scrollY }: { className?
       </MenuItem>
       <button
         onClick={onQuizClick}
-        className="cursor-pointer text-white hover:opacity-[0.9]"
+        className="cursor-pointer text-black hover:opacity-[0.9]"
       >
         Find Your Blend
       </button>

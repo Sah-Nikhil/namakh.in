@@ -7,16 +7,16 @@ import MobileNav from "@/components/mobile-nav";
 
 export default function ShopIndex() {
   return (
-    <div className="bg-white min-h-screen text-black font-sans selection:bg-blue-500/30">
+    <div className="bg-white dark:bg-neutral-900 min-h-screen text-black dark:text-white font-sans selection:bg-blue-500/30">
       <Navbar />
       <MobileNav />
 
       <main className="pt-32 pb-20 px-4 max-w-7xl mx-auto">
         <div className="text-center mb-20 space-y-4">
-            <h1 className="text-5xl md:text-7xl font-bold text-black">
+            <h1 className="text-5xl md:text-7xl font-bold text-black dark:text-white">
               The Collection
             </h1>
-            <p className="text-xl text-neutral-600 max-w-2xl mx-auto">
+            <p className="text-xl text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto">
                 Precision-formulated electrolytes for every lifestyle. Find your perfect balance.
             </p>
         </div>

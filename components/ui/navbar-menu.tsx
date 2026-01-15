@@ -32,7 +32,7 @@ export const MenuItem = ({
             <Link href={href} className="inline-block">
                 <motion.p
                     transition={{ duration: 0.3 }}
-                    className="cursor-pointer text-white hover:opacity-[0.9]"
+                    className="cursor-pointer text-black hover:opacity-[0.9]"
                 >
                     {item}
                 </motion.p>
@@ -40,7 +40,7 @@ export const MenuItem = ({
         ) : (
             <motion.p
                 transition={{ duration: 0.3 }}
-                className="cursor-pointer text-white hover:opacity-[0.9]"
+                className="cursor-pointer text-black hover:opacity-[0.9]"
             >
                 {item}
             </motion.p>
@@ -56,7 +56,7 @@ export const MenuItem = ({
                 <motion.div
                     transition={transition}
                     layoutId="active" // layoutId ensures smooth animation
-                    className="bg-black/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/[0.2] shadow-xl"
+                    className="bg-white/25 backdrop-blur-sm rounded-2xl overflow-hidden border border-black/[0.2] shadow-xl"
                 >
                     <motion.div
                     layout // layout ensures smooth animation
@@ -85,7 +85,7 @@ export const Menu = ({
     return (
         <nav
         onMouseLeave={() => setActive(null)} // resets the state
-        className="relative rounded-full border border-white/[0.2] bg-black/85 shadow-input flex items-center px-8 py-6 "
+        className="relative rounded-full border border-black/[0.2] bg-white/60 shadow-input flex items-center px-8 py-6 "
         >
         {/* Logo pinned to the left of the navbar */}
         <Link href="/" className="flex items-center">
@@ -125,10 +125,10 @@ export const ProductItem = ({
             className="shrink-0 rounded-md shadow-2xl"
         />
         <div className="flex flex-col justify-center">
-            <h4 className="text-xl font-bold mb-1 text-white">
+            <h4 className="text-xl font-bold mb-1 text-black">
             {title}
             </h4>
-            <p className="text-neutral-300 text-sm max-w-[10rem] whitespace-nowrap">
+            <p className="text-neutral-300 text-sm max-w-[10rem] blackspace-nowrap">
             {description}
             </p>
         </div>

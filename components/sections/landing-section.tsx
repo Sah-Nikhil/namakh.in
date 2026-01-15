@@ -31,7 +31,7 @@ export default function LandingSection({ scrollY }: LandingSectionProps) {
                 transition={{ duration: 1, ease: 'easeOut' }}
                 />
                 <motion.img
-                className="text-5xl md:text-7xl font-bold text-brand-red tracking-tight mt-6 md:mt-8"
+                className="text-5xl md:text-7xl font-bold text-brand-red tracking-tight mt-6 md:mt-8 dark:text-white"
                 style={{ fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}
                 src="/assets/namakh_logo.png"
                 alt="Namakh Logo"
@@ -49,7 +49,7 @@ export default function LandingSection({ scrollY }: LandingSectionProps) {
             <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-            className="text-brand-red text-4xl text-white"
+            className="text-brand-red text-4xl text-white dark:text-white"
             >
             ↓
             </motion.div>

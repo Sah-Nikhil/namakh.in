@@ -16,7 +16,7 @@ export default function Home() {
     const { scrollY } = useScroll();
 
     return (
-        <div className="bg-white text-black min-h-screen font-sans selection:bg-blue-500/30">
+        <div className="bg-white dark:bg-neutral-900 text-black dark:text-white min-h-screen font-sans selection:bg-blue-500/30">
             <Navbar scrollY={scrollY} onQuizClick={() => setIsQuizOpen(true)} />
             <MobileNav onQuizClick={() => setIsQuizOpen(true)} />
 
@@ -35,11 +35,12 @@ export default function Home() {
                 </BackgroundGradientAnimation>
 
 
-                <section className="w-full pt-16 pb-24 px-4 bg-white">
+                <section className="w-full pt-16 pb-24 px-4 bg-white dark:bg-neutral-900">
                     <div className="max-w-4xl mx-auto text-center space-y-12">
                         <div className="space-y-4">
-                            <h2 className="text-5xl md:text-7xl font-bold">Hydrate smarter, not harder.</h2>
-                            </div>
+                            <h2 className="text-5xl md:text-7xl font-bold dark:text-white">Hydrate smarter, not harder.</h2>
+                            add img here (from obsidian)
+                        </div>
                     </div>
                 </section>
 
