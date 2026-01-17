@@ -22,14 +22,14 @@ export default function LandingSection({ scrollY }: LandingSectionProps) {
                 }}
                 className="relative z-10 flex flex-col items-center"
             >
-                <motion.img
+                {/* <motion.img
                 src="/assets/namakh_logo_droplet.png"
                 alt="Namakh Droplet"
                 className="w-[450px] md:w-[650px] h-auto mb-6"
                 initial={{ opacity: 0, scale: 0.65 }}
                 animate={{ opacity: 1, scale: 0.85, y: 0 }}
                 transition={{ duration: 1, ease: 'easeOut' }}
-                />
+                /> */}
                 <motion.img
                 className="text-5xl md:text-7xl font-bold text-brand-red tracking-tight mt-6 md:mt-8 dark:text-white"
                 style={{ fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}

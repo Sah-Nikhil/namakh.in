@@ -10,6 +10,7 @@ import { BackgroundGradientAnimation } from "@/components/ui/background-gradient
 import QuizModal from "@/components/quiz-modal";
 import { ScienceSection, RootedSection, ProductCTASection } from "@/components/sections";
 import LandingSection from "@/components/sections/landing-section";
+import BenefitsSection from "@/components/sections/some-section";
 
 export default function Home() {
     const [isQuizOpen, setIsQuizOpen] = useState(false);
@@ -35,11 +36,11 @@ export default function Home() {
                 </BackgroundGradientAnimation>
 
 
-                <section className="w-full pt-16 pb-24 px-4 bg-white dark:bg-neutral-900">
+                <section className="w-full pt-24 px-4 bg-white dark:bg-neutral-900">
                     <div className="max-w-4xl mx-auto text-center space-y-12">
                         <div className="space-y-4">
                             <h2 className="text-5xl md:text-7xl font-bold dark:text-white">Hydrate smarter, not harder.</h2>
-                            add img here (from obsidian)
+                            <BenefitsSection />
                         </div>
                     </div>
                 </section>

@@ -35,10 +35,10 @@ export const BackgroundGradientAnimation = ({
 }) => {
   const interactiveRef = useRef<HTMLDivElement>(null);
 
-  const [curX, setCurX] = useState(0);
-  const [curY, setCurY] = useState(0);
   const [tgX, setTgX] = useState(0);
   const [tgY, setTgY] = useState(0);
+  const curXRef = useRef(0);
+  const curYRef = useRef(0);
   useEffect(() => {
     document.body.style.setProperty(
       "--gradient-background-start",
@@ -59,18 +59,19 @@ export const BackgroundGradientAnimation = ({
   }, []);
 
   useEffect(() => {
-    function move() {
-      if (!interactiveRef.current) {
-        return;
+    let animationFrameId: number;
+    function animate() {
+      const dx = tgX - curXRef.current;
+      const dy = tgY - curYRef.current;
+      curXRef.current += dx / 20;
+      curYRef.current += dy / 20;
+      if (interactiveRef.current) {
+        interactiveRef.current.style.transform = `translate(${Math.round(curXRef.current)}px, ${Math.round(curYRef.current)}px)`;
       }
-      setCurX(curX + (tgX - curX) / 20);
-      setCurY(curY + (tgY - curY) / 20);
-      interactiveRef.current.style.transform = `translate(${Math.round(
-        curX
-      )}px, ${Math.round(curY)}px)`;
+      animationFrameId = requestAnimationFrame(animate);
     }
-
-    move();
+    animate();
+    return () => cancelAnimationFrame(animationFrameId);
   }, [tgX, tgY]);
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -92,6 +93,7 @@ export const BackgroundGradientAnimation = ({
         "h-screen w-screen relative overflow-hidden top-0 left-0 bg-[linear-gradient(40deg,var(--gradient-background-start),var(--gradient-background-end))]",
         containerClassName
       )}
+      onMouseMove={interactive ? handleMouseMove : undefined}
     >
       <svg className="hidden">
         <defs>
@@ -167,7 +169,6 @@ export const BackgroundGradientAnimation = ({
         {interactive && (
           <div
             ref={interactiveRef}
-            onMouseMove={handleMouseMove}
             className={cn(
               `absolute [background:radial-gradient(circle_at_center,_rgba(var(--pointer-color),_0.8)_0,_rgba(var(--pointer-color),_0)_50%)_no-repeat]`,
               `[mix-blend-mode:var(--blending-value)] w-full h-full -top-1/2 -left-1/2`,
