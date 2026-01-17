@@ -72,7 +72,7 @@ const Footer: React.FC = () => {
                             <input
                                 type="email"
                                 placeholder="Enter Email..."
-                                className="px-3 py-2 rounded bg-gray-900 text-white border border-gray-700 focus:outline-none focus:border-white w-full"
+                                className="px-3 py-2 rounded bg-neutral-900 text-white border border-gray-700 focus:outline-none focus:border-white w-full"
                             />
                             <button
                                 type="submit"
