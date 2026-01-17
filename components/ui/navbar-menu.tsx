@@ -85,7 +85,7 @@ export const Menu = ({
     return (
         <nav
         onMouseLeave={() => setActive(null)} // resets the state
-        className="relative rounded-full border border-black/[0.2] bg-white/60 shadow-input flex items-center px-8 py-6 "
+        className="relative backdrop-blur-sm rounded-full border border-black/[0.2] bg-white/60 shadow-input flex items-center px-8 py-6 "
         >
         {/* Logo pinned to the left of the navbar */}
         <Link href="/" className="flex items-center">
