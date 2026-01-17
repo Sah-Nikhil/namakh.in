@@ -8,9 +8,8 @@ import Footer from "@/components/ui/footer-modern";
 import Hero from "@/components/hero";
 import { BackgroundGradientAnimation } from "@/components/ui/background-gradient-animation";
 import QuizModal from "@/components/quiz-modal";
-import { ScienceSection, RootedSection, ProductCTASection } from "@/components/sections";
+import { ScienceSection, RootedSection, ProductCTASection, BenefitsSection } from "@/components/sections";
 import LandingSection from "@/components/sections/landing-section";
-import BenefitsSection from "@/components/sections/some-section";
 
 export default function Home() {
     const [isQuizOpen, setIsQuizOpen] = useState(false);
@@ -39,14 +38,13 @@ export default function Home() {
                 <section className="w-full pt-24 px-4 bg-white dark:bg-neutral-900">
                     <div className="max-w-4xl mx-auto text-center space-y-12">
                         <div className="space-y-4">
-                            <h2 className="text-5xl md:text-7xl font-bold dark:text-white">Hydrate smarter, not harder.</h2>
-                            <BenefitsSection />
+                            <h2 className="text-5xl md:text-7xl font-bold dark:text-white">Electrolytes, Done Right.</h2>
                         </div>
                     </div>
                 </section>
 
-                <RootedSection />
                 <ScienceSection />
+                <RootedSection />
                 <ProductCTASection onQuizClick={() => setIsQuizOpen(true)} />
 
             </div>

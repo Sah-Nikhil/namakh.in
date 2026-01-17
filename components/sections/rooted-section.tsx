@@ -3,10 +3,26 @@ import { motion } from "framer-motion";
 
 export default function RootedSection() {
     const audienceItems = [
-    { icon: "🏃‍♂", label: "Athletes\n& Lifters" },
-    { icon: "🌞", label: "Heat & Humid\nClimates" },
-    { icon: "🧘", label: "Everyday\nWellness" },
-    { icon: "💼", label: "Work\n& Travel" },
+    {
+        src: "https://res.cloudinary.com/dg0m1wsvu/image/upload/f_auto,q_auto/v1670960629/components/benefits-icons/icon-vegan-friendly.svg",
+        alt: "Athletes & Lifters",
+        label: "Athletes\n& Lifters"
+    },
+    {
+        src: "https://res.cloudinary.com/dg0m1wsvu/image/upload/f_auto,q_auto/v1670960629/components/benefits-icons/icon-no-sugar_1.svg",
+        alt: "Heat & Humid Climates",
+        label: "Heat & Humid\nClimates"
+    },
+    {
+        src: "https://res.cloudinary.com/dg0m1wsvu/image/upload/f_auto,q_auto/v1670960629/components/benefits-icons/icon-gluten-free.svg",
+        alt: "Everyday Wellness",
+        label: "Everyday\nWellness"
+    },
+    {
+        src: "https://res.cloudinary.com/dg0m1wsvu/image/upload/f_auto,q_auto/v1670960629/components/benefits-icons/icon-ingredients.svg",
+        alt: "Work & Travel",
+        label: "Work\n& Travel"
+    },
 ];
     function Flag() {
         return (
@@ -55,25 +71,32 @@ export default function RootedSection() {
                     </p>
                 </div>
             </div> */}
-            <div className="max-w-5xl mx-auto text-center space-y-12 relative z-10">
+            <div className="max-w-5xl mx-auto text-center space-y-10 relative z-10">
             <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="space-y-2 pt-12"
+                    className="space-y-2 pt-8"
                 >
-                    <h1 className="text-[1.4rem] font-semibold tracking-[0.3em] text-blue-400 uppercase">Who is Namakh for?</h1>
-                </motion.div>
+                    <h1 className="text-[1.4rem] font-semibold tracking-[0.3em] text-blue-400 uppercase">Where can you use Namakh?</h1>
+            </motion.div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-16 px-auto">
                     {audienceItems.map((item, i) => (
-                        <div key={i} className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/20 transition-colors">
-                            <span className="text-4xl">{item.icon}</span>
+                        <div key={i} className="flex flex-col items-center gap-4 px-6 transition-colors">
+                            <img
+                                src={item.src}
+                                width={55}
+                                height={55}
+                                alt={item.alt}
+                                loading="lazy"
+                                className="opacity-60 dark:opacity-100 dark:invert"
+                            />
                             <span className="text-sm font-medium text-neutral-600 dark:text-neutral-300 whitespace-pre-line">{item.label}</span>
                         </div>
                     ))}
                 </div>
-                </div>
+            </div>
         </section>
     );
 }
