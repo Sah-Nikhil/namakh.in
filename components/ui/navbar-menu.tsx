@@ -56,7 +56,7 @@ export const MenuItem = ({
                 <motion.div
                     transition={transition}
                     layoutId="active" // layoutId ensures smooth animation
-                    className="bg-white/25 backdrop-blur-sm rounded-2xl overflow-hidden border border-black/[0.2] shadow-xl"
+                    className="bg-white/85 rounded-2xl overflow-hidden border border-black/[0.2] shadow-xl"
                 >
                     <motion.div
                     layout // layout ensures smooth animation
@@ -76,7 +76,7 @@ export const MenuItem = ({
 export const Menu = ({
     setActive,
     children,
-    logoSrc = "/assets/namakh_logo.png",
+    logoSrc = "/assets/namakh_logo_blk.png",
     }: {
     setActive: (item: string | null) => void;
     children: React.ReactNode;
@@ -128,7 +128,7 @@ export const ProductItem = ({
             <h4 className="text-xl font-bold mb-1 text-black">
             {title}
             </h4>
-            <p className="text-neutral-300 text-sm max-w-[10rem] blackspace-nowrap">
+            <p className="text-neutral-700 text-sm max-w-[10rem] blackspace-nowrap">
             {description}
             </p>
         </div>

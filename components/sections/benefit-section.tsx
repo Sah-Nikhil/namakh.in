@@ -30,7 +30,7 @@ export default function BenefitsSection() {
 				{benefits.map((benefit) => (
 					<div
 						key={benefit.alt}
-						className="flex w-1/2 flex-col items-center p-4 text-center lg:w-1/5"
+						className="flex w-1/2 sm:w-1/3 md:w-1/3 lg:w-1/5 flex-col items-center p-4 text-center"
 					>
 						<img
 							src={benefit.src}

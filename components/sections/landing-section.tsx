@@ -8,8 +8,8 @@ interface LandingSectionProps {
 
 export default function LandingSection({ scrollY }: LandingSectionProps) {
   // Transform logo size and position based on scroll
-  const logoScale = useTransform(scrollY, [0, 300], [1, 0.15])
-  const logoY = useTransform(scrollY, [0, 300], [0, -45])
+  const logoScale = useTransform(scrollY, [0, 300], [1, 0.2])
+  const logoY = useTransform(scrollY, [0, 300], [0, -40])
   const opacity = useTransform(scrollY, [0, 200, 300], [1, 0.5, 0])
 
   return (
@@ -31,7 +31,7 @@ export default function LandingSection({ scrollY }: LandingSectionProps) {
                 transition={{ duration: 1, ease: 'easeOut' }}
                 /> */}
                 <motion.img
-                className="text-5xl md:text-7xl font-bold text-brand-red tracking-tight mt-6 md:mt-8 dark:text-white"
+                className="w-full max-w-[480px] md:max-w-[800px] lg:max-w-[1400px] h-auto font-bold text-brand-red tracking-tight mt-6 md:mt-8 dark:text-white"
                 style={{ fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}
                 src="/assets/namakh_logo.png"
                 alt="Namakh Logo"

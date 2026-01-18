@@ -14,11 +14,11 @@ export default function ScienceSection() {
                     className="space-y-6"
                 >
 
-                    <p className="text-3xl dark:text-4xl font-bold leading-tight dark:text-blue-400 text-white">
+                    <p className="text-xl md:text-3xl lg:text-4xl font-bold leading-tight text-white dark:text-blue-400">
                         &ldquo;When you hydrate right, you think sharper, perform better, and recover faster.&rdquo;
                     </p>
                     {/* <h2 className="text-xl font-semibold tracking-[0.3em] text-blue-400 dark:text-blue-300 uppercase">The Science Behind Namakh</h2> */}
-                    <p className="pt-4 text-xl text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto">
+                    <p className="pt-4 text-lg md:text-xl text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto px-4">
                         Dehydration by just <span className="text-black dark:text-white font-bold">2%</span> can reduce endurance, focus, and mood.
                         <br />
                         Namakh restores optimal fluid balance and cellular hydration - FAST.
