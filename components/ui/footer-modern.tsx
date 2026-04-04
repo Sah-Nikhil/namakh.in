@@ -26,18 +26,18 @@ const Footer: React.FC = () => {
                         <h4 className="font-semibold mb-2">About</h4>
                         <ul className="space-y-1 text-gray-300">
                             {/* <li><Link href="#" className="hover:text-white">Our Story</Link></li> */}
-                            <li><Link href="#" className="hover:text-white">Formulation</Link></li>
+                            <li><Link href="/formulation" className="hover:text-white">Formulation</Link></li>
                             {/* <li><Link href="#" className="hover:text-white">Science</Link></li> */}
-                            <li><Link href="#" className="hover:text-white">Recipes</Link></li>
+                            {/* <li><Link href="/recipes" className="hover:text-white">Recipes</Link></li> */}
                         </ul>
                     </div>
                     {/* Shop */}
                     <div className="flex flex-col gap-2 min-w-[100px] md:min-w-[150px]">
-                        <h4 className="font-semibold mb-2">Shop</h4>
+                        <h4 className="font-semibold mb-2"><Link href="/shop">Shop</Link></h4>
                         <ul className="space-y-1 text-gray-300">
                             {/* <li><Link href="#" className="hover:text-white">Shop All</Link></li> */}
-                            <li><Link href="#" className="hover:text-white">Hydration Pack</Link></li>
-                            <li><Link href="#" className="hover:text-white">Sports Pack</Link></li>
+                            <li><Link href="/shop/hydration-blend" className="hover:text-white">Hydration Blend</Link></li>
+                            <li><Link href="/shop/sports-blend" className="hover:text-white">Sports Blend</Link></li>
                             {/* <li><Link href="#" className="hover:text-white">Merchandise</Link></li> */}
                         </ul>
                     </div>
@@ -47,8 +47,8 @@ const Footer: React.FC = () => {
                         <ul className="space-y-1 text-gray-300">
                             {/* <li><Link href="#" className="hover:text-white">Sign In</Link></li> */}
                             {/* <li><Link href="#" className="hover:text-white">Help Center</Link></li> */}
-                            <li><Link href="#" className="hover:text-white">FAQ</Link></li>
-                            <li><Link href="#" className="hover:text-white">Contact Us</Link></li>
+                            <li><Link href="/faq" className="hover:text-white">FAQ</Link></li>
+                            {/* <li><Link href="#" className="hover:text-white">Contact Us</Link></li> */}
                             {/* <li><Link href="#" className="hover:text-white">Wholesale</Link></li> */}
                         </ul>
                     </div>

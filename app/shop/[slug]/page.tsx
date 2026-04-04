@@ -98,7 +98,7 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
 
                 <div className="text-3xl font-semibold text-neutral-900 dark:text-white">
                     ₹{product.price}
-                    <span className="text-sm font-normal text-neutral-600 dark:text-neutral-400 ml-2">/ per pack (30 servings)</span>
+                    <span className="text-sm font-normal text-neutral-600 dark:text-neutral-400 ml-2">{product.quantity}</span>
                 </div>
 
                 {/* Quick Stats Grid */}
@@ -115,18 +115,19 @@ export default function ProductPage({ params }: { params: Promise<{ slug: string
                         <p className="text-sm text-neutral-600 dark:text-neutral-400">Magnesium</p>
                         <p className="text-xl font-bold dark:text-white">{product.stats.magnesium} mg</p>
                     </div>
-                     <div className="space-y-1">
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">Sugar</p>
-                        <p className="text-xl font-bold dark:text-white">{product.stats.dextrose} g</p>
-                    </div>
-                    <div className="space-y-1">
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">Glycine</p>
-                        <p className="text-xl font-bold dark:text-white">{product.stats.glycine} mg</p>
-                    </div>
                     <div className="space-y-1">
                         <p className="text-sm text-neutral-600 dark:text-neutral-400">Citric Acid</p>
                         <p className="text-xl font-bold dark:text-white">{product.stats.citricAcid} mg</p>
                     </div>
+                     <div className="space-y-1">
+                        <p className="text-sm text-neutral-600 dark:text-neutral-400">Sugar</p>
+                        <p className="text-xl font-bold dark:text-white">{product.stats.dextrose} g</p>
+                    </div>
+                    {/* <div className="space-y-1">
+                        <p className="text-sm text-neutral-600 dark:text-neutral-400">Glycine</p>
+                        <p className="text-xl font-bold dark:text-white">{product.stats.glycine} mg</p>
+                    </div> */}
+
                 </div>
 
                 <div className="prose text-neutral-800 dark:text-neutral-200">

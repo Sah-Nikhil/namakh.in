@@ -5,12 +5,13 @@ export type Product = {
   tagline: string;
   description: string;
   price: number;
+  quantity: string;
   stats: {
     sodium: number; // mg
     potassium: number; // mg
     magnesium: number; // mg
     dextrose?: number; // g
-    glycine?: number; // mg
+    // glycine?: number; // mg
     citricAcid?: number; // mg
   };
   features: string[];
@@ -26,25 +27,29 @@ export const products: Product[] = [
     name: "Hydration Blend",
     tagline: "Everyday balance for energy, clarity, and recovery.",
     description:
-      "The Namakh Hydration Blend keeps you energized and clear-headed every day — without sugar or heaviness. Perfect for daily use, light workouts, travel, or hot weather.",
-    price: 999,
+      "The Namakh Hydration Blend keeps you energized and clear-headed every day - without sugar or heaviness. Perfect for daily use, light workouts, travel, or hot weather.",
+    price: 1450,
+    quantity: "/ per pack (50 servings)",
     stats: {
       sodium: 600,
       potassium: 400,
       magnesium: 60,
       dextrose: 0,
-      glycine: 500,
+    //   glycine: 500,
       citricAcid: 100,
     },
     features: [
       "Zero Sugar",
-      "Glycine for smooth taste & gut support",
+    //   "Glycine for smooth taste & gut support",
       "Optimal electrolyte balance",
     ],
     image: "/assets/hydration_pack.png",
     nutritionalLabel: "/assets/hydration_nut.png",
     idealFor: ["Daily Hydration", "Light Workouts", "Travel", "Heat"],
   },
+
+
+
   {
     id: "sports-blend",
     slug: "sports-blend",
@@ -52,19 +57,20 @@ export const products: Product[] = [
     tagline: "High-performance hydration for athletes & heavy sweaters.",
     description:
       "The Namakh Sports Blend fuels your toughest sessions with electrolytes and clean energy. Designed for intense training, long runs, and match days.",
-    price: 1199,
+    price: 1150,
+    quantity: "/ per pack (30 servings)",
     stats: {
       sodium: 1000,
       potassium: 600,
       magnesium: 100,
       dextrose: 3,
-      glycine: 500,
+    //   glycine: 500,
       citricAcid: 180,
     },
     features: [
-      "3g Dextrose for quick energy",
-      "Higher Sodium for heavy sweaters",
+    //   "3g Dextrose for quick energy",
       "Rapid absorption",
+      "Higher Sodium for heavy sweaters",
     ],
     image: "/assets/sports_pack.png",
     nutritionalLabel: "/assets/sports_nut.png",
