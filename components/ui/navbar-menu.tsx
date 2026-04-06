@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
 import { motion } from "motion/react";
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 
 const transition = {
     type: "spring",
@@ -11,27 +11,40 @@ const transition = {
     stiffness: 100,
     restDelta: 0.001,
     restSpeed: 0.001,
-};
+} as const;
 
 export const MenuItem = ({
     setActive,
     active,
     item,
+    href,
     children,
     }: {
     setActive: (item: string) => void;
     active: string | null;
     item: string;
+    href?: string;
     children?: React.ReactNode;
     }) => {
     return (
         <div onMouseEnter={() => setActive(item)} className="relative ">
-        <motion.p
-            transition={{ duration: 0.3 }}
-            className="cursor-pointer text-white hover:opacity-[0.9]"
-        >
-            {item}
-        </motion.p>
+        {href ? (
+            <Link href={href} className="inline-block">
+                <motion.p
+                    transition={{ duration: 0.3 }}
+                    className="cursor-pointer text-black hover:opacity-[0.9]"
+                >
+                    {item}
+                </motion.p>
+            </Link>
+        ) : (
+            <motion.p
+                transition={{ duration: 0.3 }}
+                className="cursor-pointer text-black hover:opacity-[0.9]"
+            >
+                {item}
+            </motion.p>
+        )}
         {active !== null && (
             <motion.div
             initial={{ opacity: 0, scale: 0.85, y: 10 }}
@@ -43,7 +56,7 @@ export const MenuItem = ({
                 <motion.div
                     transition={transition}
                     layoutId="active" // layoutId ensures smooth animation
-                    className="bg-black/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/[0.2] shadow-xl"
+                    className="bg-white/85 rounded-2xl overflow-hidden border border-black/[0.2] shadow-xl"
                 >
                     <motion.div
                     layout // layout ensures smooth animation
@@ -63,7 +76,7 @@ export const MenuItem = ({
 export const Menu = ({
     setActive,
     children,
-    logoSrc = "/assets/namakh_logo.png",
+    logoSrc = "/assets/namakh_logo_blk.png",
     }: {
     setActive: (item: string | null) => void;
     children: React.ReactNode;
@@ -72,7 +85,7 @@ export const Menu = ({
     return (
         <nav
         onMouseLeave={() => setActive(null)} // resets the state
-        className="relative rounded-full border border-white/[0.2] bg-black/85 shadow-input flex items-center px-8 py-6 "
+        className="relative backdrop-blur-sm rounded-full border border-black/[0.2] bg-white/60 shadow-input flex items-center px-8 py-6 "
         >
         {/* Logo pinned to the left of the navbar */}
         <Link href="/" className="flex items-center">
@@ -104,7 +117,7 @@ export const ProductItem = ({
     }) => {
     return (
         <a href={href} className="flex space-x-2">
-        <img
+        <Image
             src={src}
             width={140}
             height={70}
@@ -112,10 +125,10 @@ export const ProductItem = ({
             className="shrink-0 rounded-md shadow-2xl"
         />
         <div className="flex flex-col justify-center">
-            <h4 className="text-xl font-bold mb-1 text-white">
+            <h4 className="text-xl font-bold mb-1 text-black">
             {title}
             </h4>
-            <p className="text-neutral-300 text-sm max-w-[10rem] whitespace-nowrap">
+            <p className="text-neutral-700 text-sm max-w-[10rem] blackspace-nowrap">
             {description}
             </p>
         </div>
@@ -123,13 +136,17 @@ export const ProductItem = ({
     );
 };
 
-export const HoveredLink = ({ children, ...rest }: any) => {
+export const HoveredLink = (
+    props: React.AnchorHTMLAttributes<HTMLAnchorElement> & { children?: React.ReactNode }
+) => {
+    const { children, className, ...rest } = props;
+    const mergedClassName = `${className ?? ""} text-neutral-200 hover:text-black`.trim();
     return (
         <a
-        {...rest}
-    className="text-neutral-200 hover:text-black "
+            {...(rest as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+            className={mergedClassName}
         >
-        {children}
+            {children}
         </a>
     );
 };
