@@ -2,3 +2,8 @@ export { default as ScienceSection } from "./science-section";
 export { default as RootedSection } from "./rooted-section";
 export { default as ProductCTASection } from "./product-cta-section";
 export { default as BenefitsSection } from "./benefit-section";
+export { default as PrinciplesSection } from "./principles-section";
+export { default as HowItWorksSection } from "./how-it-works-section";
+export { default as ComparisonSection } from "./comparison-section";
+export { default as Ticker } from "./ticker";
+export { default as LandingSection } from "./landing-section";

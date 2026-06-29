@@ -1,40 +1,62 @@
 "use client";
 
-import { motion } from "framer-motion";
+import Reveal from "@/components/ui/reveal";
 import NMKGraph from "../graph";
 
 export default function ScienceSection() {
-    return (
-        <section className="w-full mt-12 py-12 px-4 bg-white dark:bg-neutral-900 relative overflow-hidden">
+  return (
+    <section className="relative w-full px-5 md:px-10 py-24 md:py-36 border-t border-line">
+      <div className="mx-auto max-w-6xl">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+          {/* Copy column */}
+          <div className="lg:col-span-5">
+            <Reveal>
+              <span className="kicker">/ The Science</span>
+              <h2 className="display-xl mt-5 text-4xl md:text-6xl text-bone">
+                Electrolytes,
+                <br />
+                done right.
+              </h2>
+            </Reveal>
 
-            <div className="max-w-5xl mx-auto text-center space-y-12 relative z-10">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="space-y-6"
-                >
+            <Reveal delay={0.1}>
+              <p className="mt-7 text-lg text-bone-dim leading-relaxed max-w-md">
+                Lose just{" "}
+                <span className="text-bone font-medium">2% of your water</span>{" "}
+                and endurance, focus and mood all drop with it. Namakh restores
+                optimal fluid balance and cellular hydration — fast.
+              </p>
+            </Reveal>
 
-                    <section className="w-full px-4 bg-white dark:bg-neutral-900">
-                    <div className="max-w-4xl mx-auto text-center space-y-12">
-                        <div className="space-y-4">
-                            <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold dark:text-white px-2">Electrolytes, Done Right.</h2>
-                        </div>
-                    </div>
-                </section>
+            <Reveal delay={0.18}>
+              <dl className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line">
+                {[
+                  ["≤2%", "dehydration to dull you"],
+                  ["1000mg", "sodium, Sports Blend"],
+                  ["0g", "sugar, Hydration Blend"],
+                  ["2", "blends, zero guesswork"],
+                ].map(([k, v]) => (
+                  <div key={v} className="bg-ink p-5">
+                    <dt className="font-display text-3xl md:text-4xl text-bone">
+                      {k}
+                    </dt>
+                    <dd className="mt-1 text-xs text-bone-faint leading-snug">
+                      {v}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </Reveal>
+          </div>
 
-                    {/* <p className="text-xl md:text-3xl lg:text-4xl font-bold leading-tight text-white dark:text-blue-400">
-                        &ldquo;When you hydrate right, you think sharper, perform better, and recover faster.&rdquo;
-                    </p> */}
-                    {/* <h2 className="text-xl font-semibold tracking-[0.3em] text-blue-400 dark:text-blue-300 uppercase">The Science Behind Namakh</h2> */}
-                    <p className="pt-4 text-lg md:text-xl text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto px-4">
-                        Dehydration by just <span className="text-black dark:text-white font-bold">2%</span> can reduce endurance, focus, and mood.
-                        <br />
-                        Namakh restores optimal fluid balance and cellular hydration - FAST.
-                    </p>
-                    <NMKGraph />
-                </motion.div>
+          {/* Graph column */}
+          <Reveal delay={0.12} className="lg:col-span-7">
+            <div className="rounded-3xl border border-line bg-ink-2/60 p-3 md:p-6 overflow-hidden">
+              <NMKGraph />
             </div>
-        </section>
-    );
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
 }

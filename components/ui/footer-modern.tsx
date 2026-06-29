@@ -2,105 +2,111 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] = [
+  {
+    heading: "Shop",
+    links: [
+      { label: "Hydration Blend", href: "/shop/hydration-blend" },
+      { label: "Sports Blend", href: "/shop/sports-blend" },
+      { label: "All blends", href: "/shop" },
+    ],
+  },
+  {
+    heading: "Brand",
+    links: [
+      { label: "Formulation", href: "/formulae" },
+      { label: "The science", href: "/" },
+      { label: "FAQ", href: "/" },
+    ],
+  },
+  {
+    heading: "Legal",
+    links: [
+      { label: "Refunds & Returns", href: "#" },
+      { label: "Terms of Use", href: "#" },
+      { label: "Privacy", href: "#" },
+    ],
+  },
+];
+
 const Footer: React.FC = () => {
-    return (
-        <footer className="bg-black text-white pt-12 pb-24 md:pb-6 px-4 md:px-12">
-            <div className="max-w-[90rem] mx-auto flex flex-col md:flex-row items-start md:items-start gap-6 md:gap-0 border-b border-gray-700 pb-4">
-                {/* Logo */}
-                <div className="flex flex-col justify-start items-start min-w-[120px] mr-12">
-                    <div className="mb-2">
-                        <Image
-                            src="/assets/namakh_logo.png"
-                            alt="NAMAKH Logo"
-                            width={185}
-                            height={40}
-                            className="inline-block rounded px-2 py-1"
-                            priority
-                        />
-                    </div>
-                </div>
-                {/* Columns */}
-                <div className="flex flex-1 flex-wrap gap-6 md:flex-row md:justify-between w-full">
-                    {/* About */}
-                    <div className="flex flex-col gap-2 min-w-[100px] md:min-w-[150px]">
-                        <h4 className="font-semibold mb-2">About</h4>
-                        <ul className="space-y-1 text-gray-300">
-                            {/* <li><Link href="#" className="hover:text-white">Our Story</Link></li> */}
-                            <li><Link href="/formulation" className="hover:text-white">Formulation</Link></li>
-                            {/* <li><Link href="#" className="hover:text-white">Science</Link></li> */}
-                            {/* <li><Link href="/recipes" className="hover:text-white">Recipes</Link></li> */}
-                        </ul>
-                    </div>
-                    {/* Shop */}
-                    <div className="flex flex-col gap-2 min-w-[100px] md:min-w-[150px]">
-                        <h4 className="font-semibold mb-2"><Link href="/shop">Shop</Link></h4>
-                        <ul className="space-y-1 text-gray-300">
-                            {/* <li><Link href="#" className="hover:text-white">Shop All</Link></li> */}
-                            <li><Link href="/shop/hydration-blend" className="hover:text-white">Hydration Blend</Link></li>
-                            <li><Link href="/shop/sports-blend" className="hover:text-white">Sports Blend</Link></li>
-                            {/* <li><Link href="#" className="hover:text-white">Merchandise</Link></li> */}
-                        </ul>
-                    </div>
-                    {/* Resources */}
-                    <div className="flex flex-col gap-2 min-w-[100px] md:min-w-[150px]">
-                        <h4 className="font-semibold mb-2">Resources</h4>
-                        <ul className="space-y-1 text-gray-300">
-                            {/* <li><Link href="#" className="hover:text-white">Sign In</Link></li> */}
-                            {/* <li><Link href="#" className="hover:text-white">Help Center</Link></li> */}
-                            <li><Link href="/faq" className="hover:text-white">FAQ</Link></li>
-                            {/* <li><Link href="#" className="hover:text-white">Contact Us</Link></li> */}
-                            {/* <li><Link href="#" className="hover:text-white">Wholesale</Link></li> */}
-                        </ul>
-                    </div>
-                    {/* Newsletter & Socials */}
-                    <div className="flex flex-col gap-2 w-full md:min-w-[220px] md:w-auto mt-4 md:mt-0">
-                        <div className="flex items-center flex-wrap">
-                            <span className="font-semibold mt-1">Want the latest from</span>
-                            <span className="inline-block align-middle mx-2">
-                                <Image
-                                    src="/assets/namakh_logo.png"
-                                    alt="NAMAKH Logo"
-                                    width={80}
-                                    height={18}
-                                    className="inline-block rounded px-1 py-0"
-                                    priority
-                                />
-                            </span>
-                            <span className="font-semibold mt-1">?</span>
-                        </div>
-                        <form className="flex gap-2 mb-4">
-                            <input
-                                type="email"
-                                placeholder="Enter Email..."
-                                className="px-3 py-2 rounded bg-neutral-900 text-white border border-gray-700 focus:outline-none focus:border-white w-full"
-                            />
-                            <button
-                                type="submit"
-                                className="bg-[#f4f4f4] text-[#1a1a1a] font-semibold px-4 py-2 rounded hover:bg-[#1a1a1a] hover:text-[#f4f4f4] transition whitespace-nowrap"
-                            >
-                                Get Notified
-                            </button>
-                        </form>
-                        <div className="flex gap-6 text-2xl">
-                            <Link href="#" aria-label="Instagram" className="hover:text-[#f4f4f4] text-[#1a1a1a]"><i className="fab fa-instagram" /></Link>
-                            <Link href="#" aria-label="Twitter" className="hover:text-[#f4f4f4] text-[#1a1a1a]"><i className="fab fa-twitter" /></Link>
-                            <Link href="#" aria-label="Facebook" className="hover:text-[#f4f4f4] text-[#1a1a1a]"><i className="fab fa-facebook" /></Link>
-                        </div>
-                    </div>
-                </div>
+  return (
+    <footer className="relative z-[2] border-t border-line bg-ink px-5 md:px-10 pt-20 pb-28 md:pb-12">
+      <div className="mx-auto max-w-6xl">
+        {/* Newsletter band */}
+        <div className="flex flex-col gap-8 border-b border-line pb-14 md:flex-row md:items-end md:justify-between">
+          <div className="max-w-md">
+            <span className="kicker">/ Stay salty</span>
+            <h3 className="font-display text-3xl md:text-4xl text-bone mt-4">
+              The latest from Namakh,
+              <span className="italic text-bone-dim"> once in a while.</span>
+            </h3>
+          </div>
+          <form className="flex w-full max-w-sm gap-2">
+            <input
+              type="email"
+              placeholder="you@email.com"
+              className="w-full rounded-full border border-line bg-ink-2 px-5 py-3 text-sm text-bone placeholder:text-bone-faint focus:border-bone/40 focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="shrink-0 rounded-full bg-bone px-6 py-3 text-sm font-medium text-ink transition-colors hover:bg-salt"
+            >
+              Notify me
+            </button>
+          </form>
+        </div>
+
+        {/* Columns */}
+        <div className="grid grid-cols-2 gap-10 py-14 md:grid-cols-4">
+          <div className="col-span-2 md:col-span-1">
+            <Image
+              src="/assets/namakh_logo.png"
+              alt="NAMAKH"
+              width={170}
+              height={42}
+              className="h-auto w-[150px]"
+            />
+            <p className="mt-4 max-w-[16rem] text-sm text-bone-faint leading-relaxed">
+              Precision electrolytes. No sugar, no nonsense.
+            </p>
+          </div>
+          {COLUMNS.map((col) => (
+            <div key={col.heading}>
+              <h4 className="kicker mb-5">{col.heading}</h4>
+              <ul className="space-y-3">
+                {col.links.map((l) => (
+                  <li key={l.label}>
+                    <Link
+                      href={l.href}
+                      className="text-bone-dim text-sm link-reveal hover:text-bone"
+                    >
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center pt-6 text-xs text-gray-400">
-                <div className="mb-2 md:mb-0">© {new Date().getFullYear()} NAMAKH, INC.</div>
-                <div className="flex flex-wrap gap-4">
-                    {/* <Link href="#" className="hover:text-white">Form C-AR Filing</Link> */}
-                    <Link href="#" className="hover:text-white">Refunds & Returns</Link>
-                    {/* <Link href="#" className="hover:text-white">Privacy Policy</Link> */}
-                    <Link href="#" className="hover:text-white">Terms of Use</Link>
-                    {/* <Link href="#" className="hover:text-white">Accessibility</Link> */}
-                </div>
-            </div>
-        </footer>
-    );
+          ))}
+        </div>
+
+        {/* Baseline */}
+        <div className="flex flex-col gap-4 border-t border-line pt-8 text-xs text-bone-faint md:flex-row md:items-center md:justify-between">
+          <span className="font-mono-jb">
+            © {new Date().getFullYear()} NAMAKH — Made with{" "}
+            <span className="text-salt">✶</span> in India
+          </span>
+          <div className="flex gap-6">
+            {["Instagram", "Twitter", "Facebook"].map((s) => (
+              <Link key={s} href="#" className="link-reveal hover:text-bone">
+                {s}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
 };
 
 export default Footer;

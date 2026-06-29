@@ -9,175 +9,174 @@ import MobileNav from "@/components/mobile-nav";
 import Footer from "@/components/ui/footer-modern";
 import { motion } from "framer-motion";
 
-export default function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
-  // Unwrap params using React.use()
+export default function ProductPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = use(params);
   const product = getProductBySlug(slug);
 
-  // Initialize selected image with the main product image
   const [selectedImage, setSelectedImage] = useState(product?.image || "");
 
   if (!product) {
     notFound();
   }
 
-  // Create a gallery array (ensuring main image is first)
-  // We can add more images here if available in the future
-  const galleryImages = [
-    product.image,
-    product.nutritionalLabel,
-    // "/assets/mockup.png", // Generic fallback for extra angles
-    // "/assets/mockup2.png"
-  ].filter(Boolean);
+  const galleryImages = [product.image, product.nutritionalLabel].filter(
+    Boolean
+  );
+
+  const stats: [string, string][] = [
+    ["Sodium", `${product.stats.sodium} mg`],
+    ["Potassium", `${product.stats.potassium} mg`],
+    ["Magnesium", `${product.stats.magnesium} mg`],
+    ["Citric Acid", `${product.stats.citricAcid} mg`],
+    ["Sugar", `${product.stats.dextrose} g`],
+  ];
 
   return (
-    <div className="bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white min-h-screen font-sans selection:bg-blue-500/30">
+    <div className="grain relative min-h-screen bg-ink text-bone font-sans">
       <Navbar />
       <MobileNav />
 
-      <main className="pt-6 md:pt-32 pb-20 px-4 md:px-8 max-w-7xl mx-auto">
-        {/* Mobile-only: Title and tagline at top */}
-        <div className="md:hidden mb-6">
-            <p className="text-blue-700 dark:text-blue-300 font-medium tracking-wider text-sm uppercase mb-2">Namakh Performance</p>
-            <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">{product.name}</h1>
-            <p className="text-lg text-neutral-700 dark:text-neutral-300 mt-2 font-light">{product.tagline}</p>
-        </div>
+      <main className="relative z-[2] mx-auto max-w-6xl px-5 md:px-10 pt-28 md:pt-40 pb-24">
+        {/* breadcrumb */}
+        <nav className="mb-8 kicker">
+          <a href="/shop" className="link-reveal hover:text-bone">
+            Shop
+          </a>
+          <span className="px-2 text-bone-faint">/</span>
+          <span className="text-bone-dim">{product.name}</span>
+        </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-
-            {/* Left Column: Image Gallery Layout */}
-            <div className="lg:col-span-7 flex flex-col-reverse md:flex-row gap-4">
-                 {/* Thumbnails (Vertical on Desktop, Horizontal on Mobile) */}
-                 <div className="flex md:flex-col gap-4 overflow-x-auto md:overflow-visible scrollbar-hide md:w-24 shrink-0">
-                    {galleryImages.map((src, i) => (
-                        <button
-                            key={i}
-                            onClick={() => setSelectedImage(src)}
-                            className={`relative w-20 h-20 md:w-24 md:h-24 rounded-lg bg-neutral-100 dark:bg-neutral-800 border overflow-hidden flex-shrink-0 transition-all ${
-                                selectedImage === src ? "border-blue-500 ring-2 ring-blue-500/20 dark:border-blue-400 dark:ring-blue-400/20" : "border-neutral-200 hover:border-neutral-400 dark:border-neutral-700 dark:hover:border-neutral-500"
-                            }`}
-                        >
-                            <Image
-                                src={src}
-                                alt={`View ${i + 1}`}
-                                fill
-                                className="object-contain p-2"
-                            />
-                        </button>
-                    ))}
-                 </div>
-
-                 {/* Main Image Viewport */}
-                 <div className="flex-1 bg-neutral-50 dark:bg-neutral-900 rounded-2xl border border-neutral-200 dark:border-neutral-700 relative aspect-[4/5] md:aspect-square flex items-center justify-center overflow-hidden">
-                      <motion.div
-                        key={selectedImage}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.3 }}
-                        className="relative w-full h-full"
-                      >
-                         <Image
-                            src={selectedImage}
-                            alt={product.name}
-                            fill
-                            className="object-contain p-8"
-                            priority
-                         />
-                      </motion.div>
-                 </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14">
+          {/* Gallery */}
+          <div className="lg:col-span-7 flex flex-col-reverse md:flex-row gap-4">
+            <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-visible scrollbar-hide md:w-24 shrink-0">
+              {galleryImages.map((src, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSelectedImage(src)}
+                  className={`relative h-20 w-20 md:h-24 md:w-24 shrink-0 overflow-hidden rounded-xl border bg-ink-2 transition-all ${
+                    selectedImage === src
+                      ? "border-bone/60 ring-1 ring-bone/20"
+                      : "border-line hover:border-bone/30"
+                  }`}
+                >
+                  <Image
+                    src={src}
+                    alt={`View ${i + 1}`}
+                    fill
+                    className="object-contain p-2"
+                  />
+                </button>
+              ))}
             </div>
 
-            {/* Right Column: Product Details */}
-            <div className="lg:col-span-5 space-y-6 md:space-y-8">
-                {/* Desktop/tablet: Title (hidden on mobile since shown above) */}
-                 <div className="hidden md:block">
-                     <p className="text-blue-700 dark:text-blue-300 font-medium tracking-wider text-sm uppercase mb-2">Namakh Performance</p>
-                     <h1 className="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-white">{product.name}</h1>
-                     <p className="text-xl text-neutral-700 dark:text-neutral-300 mt-2 font-light">{product.tagline}</p>
-                 </div>
-
-                <div className="text-3xl font-semibold text-neutral-900 dark:text-white">
-                    ₹{product.price}
-                    <span className="text-sm font-normal text-neutral-600 dark:text-neutral-400 ml-2">{product.quantity}</span>
-                </div>
-
-                {/* Quick Stats Grid */}
-                <div className="grid grid-cols-2 gap-4 py-6 border-y border-neutral-200 dark:border-neutral-700">
-                    <div className="space-y-1">
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">Sodium</p>
-                        <p className="text-xl font-bold dark:text-white">{product.stats.sodium} mg</p>
-                    </div>
-                    <div className="space-y-1">
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">Potassium</p>
-                        <p className="text-xl font-bold dark:text-white">{product.stats.potassium} mg</p>
-                    </div>
-                    <div className="space-y-1">
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">Magnesium</p>
-                        <p className="text-xl font-bold dark:text-white">{product.stats.magnesium} mg</p>
-                    </div>
-                    <div className="space-y-1">
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">Citric Acid</p>
-                        <p className="text-xl font-bold dark:text-white">{product.stats.citricAcid} mg</p>
-                    </div>
-                     <div className="space-y-1">
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">Sugar</p>
-                        <p className="text-xl font-bold dark:text-white">{product.stats.dextrose} g</p>
-                    </div>
-                    {/* <div className="space-y-1">
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400">Glycine</p>
-                        <p className="text-xl font-bold dark:text-white">{product.stats.glycine} mg</p>
-                    </div> */}
-
-                </div>
-
-                <div className="prose text-neutral-800 dark:text-neutral-200">
-                    <p>{product.description}</p>
-                </div>
-
-                <div className="space-y-4 pt-4">
-                    <button className="w-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 py-4 rounded-full font-bold text-lg hover:bg-neutral-700 dark:hover:bg-neutral-200 transition-colors">
-                        Add to Cart — ₹{product.price}
-                    </button>
-                    {/* <p className="text-center text-xs text-neutral-600 dark:text-neutral-400">
-                        Free shipping on all orders above ₹500. Secure checkout.
-                    </p> */}
-                </div>
-
-                {/* Simple Accordions for Details */}
-                <div className="space-y-4 pt-8">
-                    <details className="group border-b border-neutral-200 dark:border-neutral-700 pb-4">
-                        <summary className="flex justify-between items-center cursor-pointer list-none text-neutral-800 dark:text-neutral-200 font-medium group-hover:text-neutral-900 dark:group-hover:text-white">
-                            <span>How to Use</span>
-                            <span className="group-open:rotate-180 transition-transform">▼</span>
-                        </summary>
-                         <div className="pt-4 text-neutral-700 dark:text-neutral-300 text-sm">
-                            <ol className="list-decimal pl-5 space-y-2">
-                                <li>Mix one scoop with 500ml of water.</li>
-                                <li>Shake well/stir and enjoy.</li>
-                            </ol>
-                            <br></br>
-                            {product.name.includes("Sports")
-                            ? "Best consumed during or immediately after intense physical activity."
-                            : "Best consumed first thing in the morning or during travel/work."}
-                         </div>
-                    </details>
-
-                    <details className="group border-b border-neutral-200 dark:border-neutral-700 pb-4">
-                        <summary className="flex justify-between items-center cursor-pointer list-none text-neutral-800 dark:text-neutral-200 font-medium group-hover:text-neutral-900 dark:group-hover:text-white">
-                            <p>Ingredients Info (Stats for Nerds) </p>
-                            <span className="group-open:rotate-180 transition-transform">▼</span>
-                        </summary>
-                        {/* To be Updated @ Chirrag */}
-                         <div className="pt-4 text-neutral-700 dark:text-neutral-300 text-sm space-y-2">
-                            <p>Full spectrum electrolyte profile tailored for {product.name.includes("Sports") ? "heavy sweat    and endurance" : "daily balance"}.</p>
-                            <div className="relative h-64 w-full bg-neutral-100 dark:bg-neutral-800 rounded-lg overflow-hidden mt-4">
-                                <Image src={product.nutritionalLabel} alt="Nutrition Label" fill className="object-contain" />
-                            </div>
-                         </div>
-                    </details>
-                </div>
-
+            <div className="relative flex flex-1 aspect-[4/5] md:aspect-square items-center justify-center overflow-hidden rounded-3xl border border-line bg-ink-2">
+              <motion.div
+                key={selectedImage}
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className="relative h-full w-full"
+              >
+                <Image
+                  src={selectedImage}
+                  alt={product.name}
+                  fill
+                  className="object-contain p-10"
+                  priority
+                />
+              </motion.div>
             </div>
+          </div>
+
+          {/* Details */}
+          <div className="lg:col-span-5">
+            <span className="kicker">/ Namakh Performance</span>
+            <h1 className="display-xl mt-4 text-4xl md:text-5xl text-bone">
+              {product.name}
+            </h1>
+            <p className="mt-3 text-lg text-bone-dim font-light">
+              {product.tagline}
+            </p>
+
+            <div className="mt-7 flex items-baseline gap-3">
+              <span className="font-display text-4xl text-bone">
+                ₹{product.price}
+              </span>
+              <span className="text-sm text-bone-faint">{product.quantity}</span>
+            </div>
+
+            {/* stats */}
+            <dl className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-3">
+              {stats.map(([k, v]) => (
+                <div key={k} className="bg-ink p-4">
+                  <dt className="text-xs text-bone-faint">{k}</dt>
+                  <dd className="mt-1 font-mono-jb text-lg text-bone">{v}</dd>
+                </div>
+              ))}
+            </dl>
+
+            <p className="mt-8 text-bone-dim leading-relaxed">
+              {product.description}
+            </p>
+
+            <button className="mt-8 w-full rounded-full bg-bone py-4 text-lg font-medium text-ink transition-colors hover:bg-salt">
+              Add to Cart — ₹{product.price}
+            </button>
+
+            {/* accordions */}
+            <div className="mt-10 space-y-1">
+              <details className="group border-t border-line py-5">
+                <summary className="flex cursor-pointer list-none items-center justify-between text-bone">
+                  <span className="font-medium">How to use</span>
+                  <span className="text-bone-faint transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <div className="pt-4 text-sm text-bone-dim leading-relaxed">
+                  <ol className="list-decimal space-y-1 pl-5">
+                    <li>Mix one scoop with 500ml of water.</li>
+                    <li>Shake or stir well, and enjoy.</li>
+                  </ol>
+                  <p className="mt-3">
+                    {product.name.includes("Sports")
+                      ? "Best consumed during or immediately after intense activity."
+                      : "Best first thing in the morning, or during travel and work."}
+                  </p>
+                </div>
+              </details>
+
+              <details className="group border-t border-line py-5">
+                <summary className="flex cursor-pointer list-none items-center justify-between text-bone">
+                  <span className="font-medium">Ingredients (stats for nerds)</span>
+                  <span className="text-bone-faint transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <div className="space-y-3 pt-4 text-sm text-bone-dim leading-relaxed">
+                  <p>
+                    Full-spectrum electrolyte profile tailored for{" "}
+                    {product.name.includes("Sports")
+                      ? "heavy sweat and endurance"
+                      : "daily balance"}
+                    .
+                  </p>
+                  <div className="relative mt-2 h-64 w-full overflow-hidden rounded-2xl border border-line bg-ink-2">
+                    <Image
+                      src={product.nutritionalLabel}
+                      alt="Nutrition label"
+                      fill
+                      className="object-contain p-4"
+                    />
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
         </div>
       </main>
 
