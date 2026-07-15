@@ -238,35 +238,35 @@ export default function QuizModal({ isOpen, onClose }: { isOpen: boolean; onClos
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="absolute inset-0 bg-black/75 backdrop-blur-sm"
+        className="absolute inset-0 bg-ink/80 backdrop-blur-md"
       />
 
       {/* Modal Content */}
       <motion.div
-        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+        initial={{ scale: 0.96, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.95, opacity: 0, y: 20 }}
-        className="relative w-full max-w-2xl bg-white border border-black/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+        exit={{ scale: 0.96, opacity: 0, y: 20 }}
+        className="relative w-full max-w-2xl bg-ink-2 border border-line rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
       >
         {/* Header */}
-        <div className="p-6 border-b border-black/10 flex justify-between items-center bg-white/50">
+        <div className="p-6 border-b border-line flex justify-between items-center">
            {!result && (
               <div className="flex items-center gap-4">
                 {currentStep > 0 && (
-                  <button onClick={handleBack} className="p-1 hover:bg-black/5 rounded-full transition-colors" title="Back">
-                    <ChevronRight className="w-4 h-4 rotate-180 text-zinc-500" />
+                  <button onClick={handleBack} className="p-1 hover:bg-bone/5 rounded-full transition-colors" title="Back">
+                    <ChevronRight className="w-4 h-4 rotate-180 text-bone-dim" />
                   </button>
                 )}
-                <div className="text-sm font-semibold text-zinc-500">
+                <div className="kicker">
                   Question {currentStep + 1}/{questions.length}
                 </div>
               </div>
            )}
            {result && (
-               <div className="text-sm font-semibold text-emerald-400">Match Found!</div>
+               <div className="kicker text-salt">Match found</div>
            )}
-          <button onClick={onClose} className="p-2 hover:bg-black/10 rounded-full transition-colors">
-            <X className="w-5 h-5 text-zinc-600" />
+          <button onClick={onClose} className="p-2 hover:bg-bone/10 rounded-full transition-colors">
+            <X className="w-5 h-5 text-bone-dim" />
           </button>
         </div>
 
@@ -282,7 +282,7 @@ export default function QuizModal({ isOpen, onClose }: { isOpen: boolean; onClos
                 transition={{ duration: 0.2 }}
                 className="space-y-6"
               >
-                <h2 className="text-2xl md:text-3xl font-bold text-black">{questions[currentStep].question}</h2>
+                <h2 className="font-display text-2xl md:text-3xl text-bone">{questions[currentStep].question}</h2>
                 <div className="grid gap-3">
                   {questions[currentStep].options.map((opt) => {
                     const isSelected = (answers[questions[currentStep].id] || []).includes(opt.value);
@@ -292,12 +292,12 @@ export default function QuizModal({ isOpen, onClose }: { isOpen: boolean; onClos
                         onClick={() => handleOptionSelectSimple(questions[currentStep].id, opt.value, !!questions[currentStep].multiSelect)}
                         className={`p-4 rounded-xl text-left border transition-all duration-200 flex items-center justify-between group ${
                           isSelected
-                            ? "bg-black text-white border-black"
-                            : "bg-black/5 border-black/10 text-zinc-700 hover:bg-black/10"
+                            ? "bg-bone text-ink border-bone"
+                            : "bg-ink border-line text-bone-dim hover:border-bone/30 hover:text-bone"
                         }`}
                       >
                         <span className="font-medium text-lg">{opt.label}</span>
-                        {isSelected && <Check className="w-5 h-5 text-white" />}
+                        {isSelected && <Check className="w-5 h-5 text-ink" />}
                       </button>
                     );
                   })}
@@ -311,7 +311,7 @@ export default function QuizModal({ isOpen, onClose }: { isOpen: boolean; onClos
 
         {/* Footer (Navigation) */}
         {!result && (
-          <div className="p-6 border-t border-black/10 bg-white/50 flex justify-between">
+          <div className="p-6 border-t border-line flex justify-between">
                 {/* <div className="flex items-center gap-2 text-black px-6 py-3 rounded-full font-light  disabled:opacity-50 disabled:cursor-not-allowed transition-all italic">
                 Choose one or more options
                 </div> */}
@@ -319,7 +319,7 @@ export default function QuizModal({ isOpen, onClose }: { isOpen: boolean; onClos
                 <button
                 onClick={() => handleNext()}
                 disabled={!(answers[questions[currentStep].id] && answers[questions[currentStep].id].length > 0)}
-                className="flex items-center gap-2 bg-black text-white px-6 py-3 rounded-full font-bold hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="flex items-center gap-2 bg-bone text-ink px-6 py-3 rounded-full font-medium hover:bg-salt disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                 >
                 {currentStep === questions.length - 1 ? "Get Results" : "Next"}
                 <ChevronRight className="w-5 h-5" />
@@ -341,23 +341,23 @@ function ResultView({ result, onClose }: { result: "hydration" | "sports"; onClo
       animate={{ opacity: 1, scale: 1 }}
       className="text-center space-y-6 py-4"
     >
-      <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-black/20 to-transparent flex items-center justify-center text-5xl">
+      <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-bone/15 to-transparent border border-line flex items-center justify-center text-5xl">
         {isSports ? "⚡" : "💧"}
       </div>
 
       <div>
-        <h2 className="text-3xl font-bold mb-2">
+        <h2 className="font-display text-3xl text-bone mb-2">
           {isSports ? "You train hard — your hydration should too." : "You’re all about balance."}
         </h2>
-        <p className="text-xl text-zinc-600">
-          We recommend the <span className={`font-bold ${isSports ? "text-red-400" : "text-blue-400"}`}>
+        <p className="text-xl text-bone-dim">
+          We recommend the <span className="font-medium" style={{ color: isSports ? "var(--color-sports)" : "var(--color-hydration)" }}>
             {isSports ? "Sports Blend" : "Hydration Blend"}
           </span>
         </p>
       </div>
 
-      <div className="p-6 bg-black/5 rounded-2xl border border-black/10 text-left space-y-4">
-        <p className="text-zinc-700">
+      <div className="p-6 bg-ink rounded-2xl border border-line text-left space-y-4">
+        <p className="text-bone-dim">
           {isSports
             ? "The Namakh Sports Blend fuels your toughest sessions with electrolytes and clean energy. Designed for endurance, athletes, and anyone who sweats a lot."
             : "The Namakh Hydration Blend keeps you energized and clear-headed every day — without sugar or heaviness. Perfect for light training, travel, or just better hydration in hot climates."
@@ -366,13 +366,13 @@ function ResultView({ result, onClose }: { result: "hydration" | "sports"; onClo
         <ul className="space-y-2">
            {isSports ? (
              <>
-                <li className="flex gap-2 text-sm text-zinc-600"><Check className="w-4 h-4 text-emerald-500"/> 1000 mg Sodium</li>
-                <li className="flex gap-2 text-sm text-zinc-600"><Check className="w-4 h-4 text-emerald-500"/> 3g Dextrose for Energy</li>
+                <li className="flex gap-2 text-sm text-bone-dim"><Check className="w-4 h-4 text-salt"/> 1000 mg Sodium</li>
+                <li className="flex gap-2 text-sm text-bone-dim"><Check className="w-4 h-4 text-salt"/> 3g Dextrose for Energy</li>
              </>
            ) : (
              <>
-                <li className="flex gap-2 text-sm text-zinc-600"><Check className="w-4 h-4 text-emerald-500"/> 600 mg Sodium</li>
-                <li className="flex gap-2 text-sm text-zinc-600"><Check className="w-4 h-4 text-emerald-500"/> Zero Sugar</li>
+                <li className="flex gap-2 text-sm text-bone-dim"><Check className="w-4 h-4 text-salt"/> 600 mg Sodium</li>
+                <li className="flex gap-2 text-sm text-bone-dim"><Check className="w-4 h-4 text-salt"/> Zero Sugar</li>
              </>
            )}
         </ul>
@@ -381,14 +381,14 @@ function ResultView({ result, onClose }: { result: "hydration" | "sports"; onClo
       <div className="pt-4 flex flex-col gap-3">
         <Link
             href={isSports ? "/shop/sports-blend" : "/shop/hydration-blend"}
-            className="w-full bg-black text-white py-4 rounded-xl font-bold text-lg hover:bg-zinc-800 transition-colors"
+            className="w-full bg-bone text-ink py-4 rounded-full font-medium text-lg hover:bg-salt transition-colors"
             onClick={onClose}
         >
           Shop {isSports ? "Sports Blend" : "Hydration Blend"}
         </Link>
         <button
             onClick={onClose}
-            className="text-zinc-500 text-sm hover:text-black transition-colors"
+            className="text-bone-faint text-sm hover:text-bone transition-colors"
         >
             Maybe later
         </button>

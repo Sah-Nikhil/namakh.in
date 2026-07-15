@@ -5,57 +5,81 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/ui/footer-modern";
 import MobileNav from "@/components/mobile-nav";
 
+const ACCENT: Record<string, string> = {
+  "hydration-blend": "var(--color-hydration)",
+  "sports-blend": "var(--color-sports)",
+};
+
 export default function ShopIndex() {
   return (
-    <div className="bg-white dark:bg-neutral-900 min-h-screen text-black dark:text-white font-sans selection:bg-blue-500/30">
+    <div className="grain relative min-h-screen bg-ink text-bone font-sans">
       <Navbar />
       <MobileNav />
 
-      <main className="pt-32 pb-20 px-4 max-w-7xl mx-auto">
-        <div className="text-center mb-20 space-y-4">
-            <h1 className="text-5xl md:text-7xl font-bold text-black dark:text-white">
-              The Collection
-            </h1>
-            <p className="text-xl text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto">
-                Precision-formulated electrolytes for every lifestyle. Find your perfect balance.
-            </p>
-        </div>
+      <main className="relative z-[2] mx-auto max-w-6xl px-5 md:px-10 pt-36 md:pt-44 pb-24">
+        <header className="mb-16 md:mb-24 max-w-3xl">
+          <span className="kicker">/ The Collection</span>
+          <h1 className="display-xl mt-5 text-5xl md:text-7xl text-bone">
+            Two blends.{" "}
+            <span className="italic text-bone-dim">Zero filler.</span>
+          </h1>
+          <p className="mt-6 text-lg text-bone-dim max-w-xl">
+            Precision-formulated electrolytes for every lifestyle. Find your
+            perfect balance — and nothing you didn&apos;t ask for.
+          </p>
+        </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-          {products.map((product) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          {products.map((product, i) => (
             <Link
-                key={product.id}
-                href={`/shop/${product.slug}`}
-                className="group relative bg-neutral-50 border border-black/10 rounded-3xl overflow-hidden hover:border-black/20 hover:shadow-xl transition-all duration-500"
+              key={product.id}
+              href={`/shop/${product.slug}`}
+              className="group relative overflow-hidden rounded-3xl border border-line bg-ink-2 transition-colors duration-500 hover:border-bone/25"
+              style={{ "--accent": ACCENT[product.slug] } as React.CSSProperties}
             >
-              <div className="relative h-[400px] md:h-[500px] w-full p-8 flex items-center justify-center bg-gradient-to-b from-neutral-100 to-white">
-                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                 <Image
-                    src={product.image}
-                    alt={product.name}
-                    width={400}
-                    height={400}
-                    className="object-contain z-0 group-hover:scale-110 transition-transform duration-700 ease-out"
-                 />
+              <div
+                className="pointer-events-none absolute -top-20 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full opacity-0 blur-3xl transition-opacity duration-700 group-hover:opacity-40"
+                style={{
+                  background:
+                    "radial-gradient(circle, var(--accent), transparent 65%)",
+                }}
+              />
+
+              <div className="relative flex items-center justify-between px-7 pt-7">
+                <span className="index-num text-bone-faint text-sm">
+                  /0{i + 1}
+                </span>
+                <span className="font-mono-jb text-sm text-bone">
+                  ₹{product.price}
+                </span>
               </div>
 
-              <div className="p-6 md:p-8 space-y-3 bg-white border-t border-black/5">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h2 className="text-2xl md:text-3xl font-bold text-black group-hover:text-blue-600 transition-colors">{product.name}</h2>
-                        <p className="text-neutral-500 mt-1 line-clamp-1">{product.tagline}</p>
-                    </div>
-                    <div className="text-xl font-semibold bg-black text-white px-4 py-1 rounded-full">
-                        ₹{product.price}
-                    </div>
-                </div>
+              <div className="relative flex h-[340px] md:h-[420px] items-center justify-center p-8">
+                <Image
+                  src={product.image}
+                  alt={product.name}
+                  width={420}
+                  height={420}
+                  className="h-full w-auto object-contain drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                />
+              </div>
 
-                <div className="pt-2 flex gap-2 flex-wrap">
-                    {product.features.slice(0, 2).map((feat, i) => (
-                        <span key={i} className="text-xs px-3 py-1 rounded-full border border-black/10 bg-neutral-100 text-neutral-700">
-                            {feat}
-                        </span>
-                    ))}
+              <div className="relative border-t border-line p-7">
+                <h2 className="font-display text-2xl md:text-3xl text-bone">
+                  {product.name}
+                </h2>
+                <p className="mt-2 text-bone-dim text-sm line-clamp-1">
+                  {product.tagline}
+                </p>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {product.features.slice(0, 2).map((feat) => (
+                    <span
+                      key={feat}
+                      className="rounded-full border border-line px-3 py-1 text-xs text-bone-dim"
+                    >
+                      {feat}
+                    </span>
+                  ))}
                 </div>
               </div>
             </Link>
