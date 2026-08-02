@@ -2,6 +2,7 @@
 
 import React, { useState, use } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/lib/products";
 import Navbar from "@/components/navbar";
@@ -43,9 +44,9 @@ export default function ProductPage({
       <main className="relative z-[2] mx-auto max-w-6xl px-5 md:px-10 pt-28 md:pt-40 pb-24">
         {/* breadcrumb */}
         <nav className="mb-8 kicker">
-          <a href="/shop" className="link-reveal hover:text-bone">
+          <Link href="/shop" className="link-reveal hover:text-bone">
             Shop
-          </a>
+          </Link>
           <span className="px-2 text-bone-faint">/</span>
           <span className="text-bone-dim">{product.name}</span>
         </nav>
