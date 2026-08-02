@@ -2,12 +2,22 @@
 
 ## Task Completion Requirements
 
-- All of `pnpm fmt`, `pnpm lint`, and `pnpm typecheck` must pass before considering tasks completed.
-<!-- - NEVER run `pnpm test`. Always use `pnpm run test` (runs Vitest). -->
+- Both `pnpm lint` and `pnpm typecheck` must pass before considering tasks completed.
+- There is no `pnpm fmt` — no formatter is installed. Match surrounding style by hand.
+- There is no test suite and no test runner. Don't invent a test command.
+
+## Read first
+
+- `CLAUDE.md` — stack, commands, structure, conventions, gotchas.
+- `CONTEXT.md` — domain vocabulary. Use those terms exactly; they have "avoid" lists.
 
 ## Project Snapshot
 
-namakh is a e-commerce website & store for all of Namakh.in's products.
+namakh is the marketing site for Namakh.in's electrolyte products, intended to grow
+into an e-commerce store.
+
+Today it is marketing-only: two hardcoded products, no cart, no checkout, no backend,
+no auth. `razorpay` is installed but has zero importers.
 
 This repository is a VERY EARLY WIP. Proposing sweeping changes that improve long-term maintainability is encouraged.
 

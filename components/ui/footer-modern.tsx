@@ -14,17 +14,19 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
   {
     heading: "Brand",
     links: [
+      { label: "About", href: "/about" },
       { label: "Formulation", href: "/formulae" },
-      { label: "The science", href: "/" },
-      { label: "FAQ", href: "/" },
+      { label: "FAQ", href: "/faq" },
+      { label: "Contact", href: "/contact" },
     ],
   },
   {
     heading: "Legal",
     links: [
-      { label: "Refunds & Returns", href: "#" },
-      { label: "Terms of Use", href: "#" },
-      { label: "Privacy", href: "#" },
+      { label: "Shipping Policy", href: "/shipping-policy" },
+      { label: "Refunds & Returns", href: "/refund-policy" },
+      { label: "Terms & Conditions", href: "/terms" },
+      { label: "Privacy Policy", href: "/privacy" },
     ],
   },
 ];
