@@ -18,13 +18,13 @@ export default function ProductPage({
   const { slug } = use(params);
   const product = getProductBySlug(slug);
 
-  const [selectedImage, setSelectedImage] = useState(product?.image || "");
+  const [selectedImage, setSelectedImage] = useState(product?.click || "");
 
   if (!product) {
     notFound();
   }
 
-  const galleryImages = [product.image, product.nutritionalLabel].filter(
+  const galleryImages = [product.click, product.image, product.nutritionalLabel].filter(
     Boolean
   );
 
@@ -140,14 +140,10 @@ export default function ProductPage({
                 </summary>
                 <div className="pt-4 text-sm text-bone-dim leading-relaxed">
                   <ol className="list-decimal space-y-1 pl-5">
-                    <li>Mix one scoop with 500ml of water.</li>
-                    <li>Shake or stir well, and enjoy.</li>
+                    {product.howToUse.map((step) => (
+                      <li key={step}>{step}</li>
+                    ))}
                   </ol>
-                  <p className="mt-3">
-                    {product.name.includes("Sports")
-                      ? "Best consumed during or immediately after intense activity."
-                      : "Best first thing in the morning, or during travel and work."}
-                  </p>
                 </div>
               </details>
 

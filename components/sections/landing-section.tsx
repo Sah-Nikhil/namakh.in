@@ -48,7 +48,7 @@ export default function LandingSection({ scrollY }: LandingSectionProps) {
         style={{ opacity }}
         className="absolute top-[18vh] left-1/2 -translate-x-1/2 text-center"
       >
-        <span className="kicker">Electrolytes · Engineered · Est. India</span>
+        <span className="kicker">Precision Electrolytes · Engineered · Est. India</span>
       </motion.div>
 
       {/* ---- Wordmark (scroll-driven) ---- */}
@@ -79,9 +79,9 @@ export default function LandingSection({ scrollY }: LandingSectionProps) {
             transition={{ duration: 1, delay: 0.85, ease: [0.22, 1, 0.36, 1] }}
             className="-mt-2 max-w-xl px-6 text-center text-base font-light leading-snug text-bone-dim md:text-xl"
           >
-            Precision electrolytes.{" "}
-            <span className="text-bone italic font-display">No sugar,</span>{" "}
-            no nonsense — just the minerals your body actually runs on.
+            {" "}
+            {/* <span className="text-bone italic font-display">Precision electrolytes.</span>{" "} */}
+            No nonsense - just the minerals your body actually runs on.
           </motion.p>
         </motion.div>
       </motion.div>

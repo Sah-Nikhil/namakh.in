@@ -5,13 +5,13 @@ import Reveal from "@/components/ui/reveal";
 const PRINCIPLES = [
   {
     n: "01",
-    title: "No sugar, ever",
-    body: "Zero grams in the Hydration Blend. Nothing to spike you, crash you, or rot your routine. Just the minerals.",
+    title: "No sugar",
+    body: "Zero grams in the Hydration Blend*. Nothing to spike you, crash you, or rot your routine. Just the minerals.",
   },
   {
     n: "02",
-    title: "Clinically-dosed",
-    body: "Up to 1000mg sodium per serve — the amounts research actually points to, not the homeopathic pinch most brands ship.",
+    title: "Precisely formulated",
+    body: "Up to 600mg Potassium per serve — the amounts research actually points to, not the homeopathic pinch most brands ship.",
   },
   {
     n: "03",
@@ -20,8 +20,8 @@ const PRINCIPLES = [
   },
   {
     n: "04",
-    title: "Two honest blends",
-    body: "One for daily balance, one for the sweat. No 14-flavour wall of choice paralysis. Pick a lane.",
+    title: "Two blends.",
+    body: "One for everyday hydration. One for when you sweat. No endless flavours or complicated choices. Just pick what fits your day.",
   },
 ];
 
@@ -32,8 +32,8 @@ export default function PrinciplesSection() {
         <Reveal className="mb-14 md:mb-20 max-w-3xl">
           <span className="kicker">/ The Brief</span>
           <h2 className="display-xl mt-5 text-4xl md:text-6xl text-bone">
-            Less in the sachet.{" "}
-            <span className="italic text-bone-dim">More in the science.</span>
+            Less in the Scoop.{" "}
+            <span className="italic text-bone-dim">More in the Science.</span>
           </h2>
         </Reveal>
 

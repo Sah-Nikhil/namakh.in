@@ -3,9 +3,10 @@
 import Reveal from "@/components/ui/reveal";
 
 const ROWS = [
-  ["Sodium per serve", "Up to 1000mg", "~150mg"],
+  ["Magnesium per serve", "Up to 100mg", "Nothing"],
   ["Added sugar", "0g", "20–34g"],
-  ["Artificial colours", "None", "Usually"],
+  ["Artificial colours", "Never", "Usually"],
+  ["Added Preservatives", "None", "Enough to take out an Elephant"],
   ["Made for", "Hydration & sweat", "Selling you a mascot"],
   ["What it costs you later", "Nothing", "The dentist"],
 ];

@@ -28,7 +28,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Namakh — Electrolytes, done right.",
   description:
-    "Precision-formulated electrolytes. No sugar, no nonsense. Two blends, engineered for how you actually live and train.",
+    "Precision-formulated electrolytes. No nonsense. Two blends, engineered for how you actually live and train.",
 };
 
 export default function RootLayout({

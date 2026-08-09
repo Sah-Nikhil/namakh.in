@@ -70,7 +70,7 @@ const Footer: React.FC = () => {
               className="h-auto w-[150px]"
             />
             <p className="mt-4 max-w-[16rem] text-sm text-bone-faint leading-relaxed">
-              Precision electrolytes. No sugar, no nonsense.
+              Precision electrolytes. No nonsense.
             </p>
           </div>
           {COLUMNS.map((col) => (

@@ -45,15 +45,17 @@ const TABS: DocTab[] = [
     label: "Products",
     content: (
       <Panel title="Products">
-        <QA q="What’s the difference between Hydration, Sports, and Heart Blend?">
+        <QA q="What’s the difference between Hydration and Sports Blends?">
+            {/* , and Heart Blend */}
           <p>
             Hydration Blend is for everyday use, no added sugar, built for daily
             fluid balance. Sports Blend is dosed higher and includes a small
             amount of dextrose to help your body absorb electrolytes faster
-            during intense training or competition. Heart Blend is formulated
-            with a different sodium-to-potassium ratio, aimed at people mindful
-            of blood pressure and cardiovascular health.
+            during intense training or competition.
           </p>
+          {/* Heart Blend is formulated
+            with a different sodium-to-potassium ratio, aimed at people mindful
+            of blood pressure and cardiovascular health. */}
         </QA>
 
         <QA q="Which blend is right for me?">

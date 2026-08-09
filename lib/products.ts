@@ -1,3 +1,5 @@
+import image from "next/image";
+
 export type Product = {
   id: string;
   slug: string;
@@ -15,7 +17,9 @@ export type Product = {
     citricAcid?: number; // mg
   };
   features: string[];
+  howToUse: string[];
   image: string;
+  click: string;
   nutritionalLabel: string;
   idealFor: string[];
 };
@@ -43,6 +47,11 @@ export const products: Product[] = [
     //   "Glycine for smooth taste & gut support",
       "Optimal electrolyte balance",
     ],
+    howToUse: [
+      "Mix 1 scoop (2.77g) of Namakh in 500ml of water, or up to 750ml based on preference.",
+      "Can be consumed anytime throughout the day.",
+    ],
+    click: "/assets/hydra.jpeg",
     image: "/assets/hydration_pack.png",
     nutritionalLabel: "/assets/hydration_nut.png",
     idealFor: ["Daily Hydration", "Light Workouts", "Travel", "Heat"],
@@ -72,6 +81,11 @@ export const products: Product[] = [
       "Rapid absorption",
       "Higher Sodium for heavy sweaters",
     ],
+    howToUse: [
+      "Mix 1 scoop (7.51g) of Namakh in 500ml of water, or up to 1000ml based on preference.",
+      "Best consumed before, during, or after physical activity.",
+    ],
+    click: "/assets/sports.jpeg",
     image: "/assets/sports_pack.png",
     nutritionalLabel: "/assets/sports_nut.png",
     idealFor: ["Intense Training", "Endurance Sports", "Heavy Sweating"],

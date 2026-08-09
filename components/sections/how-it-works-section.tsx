@@ -6,7 +6,7 @@ const STEPS = [
   {
     n: "1",
     label: "POUR",
-    body: "Tip one stick into 500ml of water. No scoops, no mess, no measuring jug.",
+    body: "Chuck one Scoop into 750-1000ml of water. No stick, no mess, no measuring jug.",
   },
   {
     n: "2",
@@ -16,7 +16,7 @@ const STEPS = [
   {
     n: "3",
     label: "GO",
-    body: "Drink it before, during or after. Your cells get what they need, on time.",
+    body: "Drink it before, during or after your workouts. Your cells get what they need, on time.",
   },
 ];
 
