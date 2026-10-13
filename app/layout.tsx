@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Fraunces, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { CartProvider } from "@/components/cart/cart-context";
+import StorefrontCart from "@/components/cart/storefront-cart";
 import { Analytics } from "@vercel/analytics/next";
 
 // Body / UI grotesque
@@ -42,7 +44,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${fraunces.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark">
-          {children}
+          <CartProvider>
+            {children}
+            <StorefrontCart />
+          </CartProvider>
         </ThemeProvider>
       </body>
       <Analytics />

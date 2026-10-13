@@ -1,5 +1,3 @@
-import image from "next/image";
-
 export type Product = {
   id: string;
   slug: string;
@@ -22,6 +20,16 @@ export type Product = {
   click: string;
   nutritionalLabel: string;
   idealFor: string[];
+  /**
+   * One pack as it leaves the warehouse, box included. Couriers price on this,
+   * and Shiprocket refuses an order without it.
+   */
+  parcel: {
+    weightGrams: number;
+    lengthCm: number;
+    breadthCm: number;
+    heightCm: number;
+  };
 };
 
 export const products: Product[] = [
@@ -55,6 +63,9 @@ export const products: Product[] = [
     image: "/assets/hydration_pack.png",
     nutritionalLabel: "/assets/hydration_nut.png",
     idealFor: ["Daily Hydration", "Light Workouts", "Travel", "Heat"],
+    // PLACEHOLDER — estimated from 50 × 2.77g of powder plus pouch and box.
+    // Replace with the client's measured, packed figures before launch.
+    parcel: { weightGrams: 250, lengthCm: 20, breadthCm: 15, heightCm: 5 },
   },
 
 
@@ -89,6 +100,9 @@ export const products: Product[] = [
     image: "/assets/sports_pack.png",
     nutritionalLabel: "/assets/sports_nut.png",
     idealFor: ["Intense Training", "Endurance Sports", "Heavy Sweating"],
+    // PLACEHOLDER — estimated from 30 × 7.51g of powder plus pouch and box.
+    // Replace with the client's measured, packed figures before launch.
+    parcel: { weightGrams: 350, lengthCm: 20, breadthCm: 15, heightCm: 6 },
   },
 ];
 

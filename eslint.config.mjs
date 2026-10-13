@@ -20,6 +20,8 @@ const eslintConfig = [
       "build/**",
       "node_modules/**",
       "next-env.d.ts",
+      // Convex writes these on every push; they are not ours to lint.
+      "convex/_generated/**",
     ],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),

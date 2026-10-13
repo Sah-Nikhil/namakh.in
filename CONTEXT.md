@@ -5,8 +5,9 @@ The **avoid** list matters as much as the definition — those synonyms are how 
 same concept ends up with three different names across files.
 
 Scope note: this describes what exists today (a marketing site with a hardcoded
-catalogue). Commerce terms — cart, order, payment — are deliberately **not** defined
-yet, because none of it is built. See `CLAUDE.md` for build/status facts.
+catalogue, plus a cart and checkout that stop short of taking money). See
+`CLAUDE.md` for build/status facts and `docs/adr/0001-checkout-flow.md` for why
+checkout is shaped the way it is.
 
 ---
 
@@ -159,14 +160,123 @@ the ink palette so `components/ui/*` keeps working unmodified — keep that mapp
 
 ---
 
+## Commerce
+
+Defined as of 2026-08-25, when the cart and checkout landed. Read
+`docs/adr/0001-checkout-flow.md` before changing any of it.
+
+### Cart
+The set of blends a visitor intends to buy, held in React context and mirrored to
+`localStorage` under `namakh.cart.v1`. Survives a closed tab. There is no
+server-side cart and no cart id.
+*Avoid* basket, bag.
+
+### Cart line
+One row of the cart: a blend plus a quantity. Product fields are copied onto the
+line rather than referenced, so a cart restored from storage still renders if the
+catalogue changes. Keyed by **slug**, never by array index.
+*Avoid* cart item, line item, order line.
+
+### Drawer
+The slide-out cart panel, `components/cart/cart-drawer.tsx`. Opens automatically
+on add-to-cart. A right-hand panel on desktop, a bottom sheet below `md`. It is
+not a page and has no route.
+*Avoid* mini cart, cart modal, side cart, flyout.
+
+### Checkout draft
+The in-progress delivery details — email, address, chosen payment method, notes —
+held in `sessionStorage` under `namakh.checkout.v1`. Deliberately shorter-lived
+than the cart: it dies with the tab.
+*Avoid* form state, customer details, checkout session.
+
+### Totals
+The priced result of a cart: subtotal, shipping, tax, COD fee, total. Produced
+only by `computeTotals()` in `lib/commerce/pricing.ts`, and recomputed server-side
+before any order is accepted. Never add up a cart by hand in a component.
+*Avoid* summary, pricing, amounts.
+
+### Order
+A cart that has been validated, priced and given an **order number**. Stored in
+Convex, in the `orders` table. An order is **recorded, not paid**: `status` and
+`paymentStatus` are separate fields, because a COD parcel can be delivered
+without ever being paid online.
+*Avoid* purchase, transaction, sale.
+
+### Order number
+The buyer-facing id, `NMK-<base36 minute>-<4 chars>`, e.g. `NMK-HQUO2-9S29`. What
+someone quotes to support. It is **semi-guessable and is not a credential**; see
+"Track token" below.
+*Avoid* order id (that is the Convex `_id`), reference number.
+
+### Track token
+32 random hex characters stored on every order. Holding it is proof enough to
+read the order, so it travels in the tracking link and is never rendered as
+visible text. The only other way in is the order number plus the email the order
+was placed with.
+*Avoid* magic link (that is the email carrying the token), order key, secret.
+
+### Order event
+One row in `orderEvents`: a status change with a buyer-facing label and a
+timestamp. Its own table, not an array on the order, because a courier adds one
+every time it scans the parcel.
+*Avoid* history entry, log, scan (a scan is the courier's, and we do not store
+those individually).
+
+### Blend key vs slug
+Unchanged by commerce: cart lines, order items and the checkout API all address a
+product by its **slug**.
+
+### Admin
+Someone allowed to see orders. Identified by a Convex Auth account, authorised
+by having their email in the `ADMIN_EMAILS` env var. The two are separate on
+purpose: anyone can create an account, almost nobody is on the list.
+*Avoid* user (there are no buyer accounts, so "user" is ambiguous), staff, owner.
+
+### Order panel
+The admin surface at `/admin`. A list of orders with an expandable row. It is
+not a fulfilment system; Shiprocket is. Say "panel", not "dashboard" (the
+Convex dashboard is a different thing and both get discussed).
+*Avoid* dashboard, back office, CMS.
+
+### Shipping quote
+A shipping price for one cart to one PIN code, stored in `shippingQuotes` for
+15 minutes. The order is charged from the stored quote, never from a number the
+browser sends. "live" when Shiprocket priced it, "fallback" when it couldn't
+be reached.
+*Avoid* rate (that's the courier's charge to the store), estimate, shipping cost.
+
+### Courier rate
+What a courier charges the store for a parcel, as Shiprocket reports it. Not
+what the buyer pays: `customerShippingFee` turns a courier rate into a quote.
+*Avoid* shipping price, shipping fee.
+
+### Push
+Creating an order in Shiprocket. Happens once, automatically, when an order is
+confirmed. Tracked by `shiprocketPush` (queued / pushed / failed).
+*Avoid* sync, export, upload.
+
+### Serviceability
+Whether we deliver to a PIN code. Answered by `/api/pincode/[code]`, which also
+supplies city and state. A failed lookup is never a blocker — the buyer types city
+and state manually.
+*Avoid* pin check, delivery check, availability.
+
+---
+
 ## Terms we are NOT using yet
 
 Listed so nobody quietly invents a meaning for them mid-feature. When any of these
 becomes real, define it here in the same session:
 
-**cart, checkout, order, payment, Razorpay** — no commerce exists. `razorpay` is an
-installed dependency with zero importers. There is no "buy" path; product pages end
-at a CTA.
+**payment, transaction, paid** — no money moves yet. Razorpay is chosen but not
+wired; an order is only ever *recorded*, never *paid*. Don't write copy or code
+that claims otherwise until `PAYMENTS_LIVE` is true.
+
+**customer, account, order history** — orders are stored, buyers are not. There
+is no auth and no way to list "my orders". One order, one link.
+
+**shipment** — we store a courier name and an AWB number on the order, but there
+is no shipment record of our own and nothing is pushed to Shiprocket yet.
 
 **customer, account, user** — no auth, no accounts, no user records. The quiz result
 is not a user profile.

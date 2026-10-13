@@ -4,6 +4,7 @@ import { products } from "@/lib/products";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/ui/footer-modern";
 import MobileNav from "@/components/mobile-nav";
+import QuickAdd from "@/components/cart/quick-add";
 
 const ACCENT: Record<string, string> = {
   "hydration-blend": "var(--color-hydration)",
@@ -71,15 +72,18 @@ export default function ShopIndex() {
                 <p className="mt-2 text-bone-dim text-sm line-clamp-1">
                   {product.tagline}
                 </p>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {product.features.slice(0, 2).map((feat) => (
-                    <span
-                      key={feat}
-                      className="rounded-full border border-line px-3 py-1 text-xs text-bone-dim"
-                    >
-                      {feat}
-                    </span>
-                  ))}
+                <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-wrap gap-2">
+                    {product.features.slice(0, 2).map((feat) => (
+                      <span
+                        key={feat}
+                        className="rounded-full border border-line px-3 py-1 text-xs text-bone-dim"
+                      >
+                        {feat}
+                      </span>
+                    ))}
+                  </div>
+                  <QuickAdd product={product} />
                 </div>
               </div>
             </Link>

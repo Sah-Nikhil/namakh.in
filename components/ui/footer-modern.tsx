@@ -18,6 +18,7 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
       { label: "Formulation", href: "/formulae" },
       { label: "FAQ", href: "/faq" },
       { label: "Contact", href: "/contact" },
+      { label: "Track your order", href: "/track" },
     ],
   },
   {

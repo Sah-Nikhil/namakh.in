@@ -9,6 +9,7 @@ import Navbar from "@/components/navbar";
 import MobileNav from "@/components/mobile-nav";
 import Footer from "@/components/ui/footer-modern";
 import { motion } from "framer-motion";
+import AddToCart from "@/components/cart/add-to-cart";
 
 export default function ProductPage({
   params,
@@ -125,9 +126,7 @@ export default function ProductPage({
               {product.description}
             </p>
 
-            <button className="mt-8 w-full rounded-full bg-bone py-4 text-lg font-medium text-ink transition-colors hover:bg-salt">
-              Add to Cart — ₹{product.price}
-            </button>
+            <AddToCart product={product} />
 
             {/* accordions */}
             <div className="mt-10 space-y-1">
