@@ -1,29 +1,37 @@
-import React from "react";
-import Image from "next/image";
-import Navbar from "../components/navbar";
-import Footer from "../components/ui/footer-modern";
-
-
+import Link from "next/link";
+import Navbar from "@/components/navbar";
+import MobileNav from "@/components/mobile-nav";
+import Footer from "@/components/ui/footer-modern";
 
 export default function NotFound() {
-
   return (
-    <>
-        <Navbar />
-        <main className="min-h-screen flex items-center justify-center bg-white dark:bg-neutral-900 text-gray-900 dark:text-white px-6">
-            <div className="max-w-3xl text-center py-24">
-            <div className="mb-6">
-                <Image src="/file.svg" alt="404" width={120} height={120} className="mx-auto" />
-            </div>
-            <h1 className="text-6xl font-bold mb-4 dark:text-white">404</h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">Sorry — the page you were looking for doesn’t exist.</p>
-            {/* <div className="flex items-center justify-center gap-4">
-                <Link href="/" className="inline-block bg-black text-white px-6 py-3 rounded font-semibold hover:opacity-90">Go home</Link>
-                <Link href="/" className="inline-block text-sm text-gray-500 underline">Or contact us</Link>
-            </div> */}
-            </div>
-        </main>
+    <div className="grain relative min-h-screen bg-ink text-bone font-sans">
+      <Navbar />
+      <MobileNav />
+      <main className="relative z-[2] flex min-h-[80vh] items-center justify-center px-6">
+        <div className="max-w-xl py-32 text-center">
+          <span className="kicker">/ 404</span>
+          <h1 className="display-xl mt-6 text-4xl text-bone md:text-6xl">Page not found.</h1>
+          <p className="mt-5 text-lg text-bone-dim">
+            The page you were looking for doesn&rsquo;t exist or has moved.
+          </p>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/shop"
+              className="rounded-full bg-bone px-6 py-3 text-sm font-medium text-ink transition-colors hover:bg-salt"
+            >
+              Shop the blends
+            </Link>
+            <Link
+              href="/"
+              className="rounded-full border border-line px-6 py-3 text-sm text-bone-dim transition-colors hover:border-bone/30 hover:text-bone"
+            >
+              Back to home
+            </Link>
+          </div>
+        </div>
+      </main>
       <Footer />
-    </>
+    </div>
   );
 }

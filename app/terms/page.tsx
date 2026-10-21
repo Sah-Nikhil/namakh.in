@@ -61,7 +61,7 @@ export default function TermsPage() {
             Harsh Nilesh Nisar (Proprietor – Namakh)
             <br />
             <span className="text-bone-dim">
-              No. 61, Perumal Koil Street Puducherry – 605001, India
+              No. 61, Perumal Koil Street, Puducherry – 605001, India
             </span>
           </p>
         </div>

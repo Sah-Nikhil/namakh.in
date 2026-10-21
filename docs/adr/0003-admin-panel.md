@@ -24,6 +24,7 @@ fulfilment is a "copy Shiprocket row" button that flattens an order into their
 bulk-upload column order, for pasting batches until the API push exists.
 
 **2. Convex Auth with email and password, not passkeys.**
+*Superseded 2026-10-21 by ADR 0006: sign-in is now an emailed 6-digit code.*
 Passkeys are the better default and the Convex skill's recommendation, but the
 people running this store sign in from whatever device is nearby and a
 device-bound credential would strand them. Reconsider once the team is stable.
@@ -65,7 +66,8 @@ parcel backwards.
   their published template and has not been checked against a real account's
   sheet. Verify before the first bulk upload. Weight is hardcoded at 0.5kg
   because nothing in the catalogue records pack weight.
-- Sign-in is rate limited with `@convex-dev/rate-limiter`: five attempts per
+- *(Superseded by ADR 0006; kept for the history.)*
+  Sign-in is rate limited with `@convex-dev/rate-limiter`: five attempts per
   email per five minutes, and forty across all emails per minute. The limit
   wraps the provider's `authorize`, which is the only place every attempt has
   to pass through — the form can be skipped by calling the action directly, and
@@ -80,3 +82,11 @@ parcel backwards.
 
   A successful sign-in refunds its allowance, so the limit only accumulates
   against failures.
+
+## Addendum, 2026-10-21: Subscribers tab
+
+The panel has an Orders / Subscribers switch. Subscribers are the `subscribers`
+table: emails from the footer "Notify me" form (via `app/api/newsletter`, which
+holds the write secret) and from buyers who ticked the opt-in box at checkout.
+One row per email. Nothing is sent to them yet; the tab offers "Copy emails"
+and a CSV download for whichever mailing tool the client picks.

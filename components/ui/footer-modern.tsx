@@ -1,6 +1,15 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import NewsletterForm from "@/components/ui/newsletter-form";
+
+/**
+ * Social profiles, as confirmed by the client. The row is hidden while this is
+ * empty rather than linking to "#".
+ */
+const SOCIALS: { label: string; href: string }[] = [
+  { label: "Instagram", href: "https://www.instagram.com/namakh.in" },
+];
 
 const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] = [
   {
@@ -15,7 +24,6 @@ const COLUMNS: { heading: string; links: { label: string; href: string }[] }[] =
     heading: "Brand",
     links: [
       { label: "About", href: "/about" },
-      { label: "Formulation", href: "/formulae" },
       { label: "FAQ", href: "/faq" },
       { label: "Contact", href: "/contact" },
       { label: "Track your order", href: "/track" },
@@ -45,19 +53,7 @@ const Footer: React.FC = () => {
               <span className="italic text-bone-dim"> once in a while.</span>
             </h3>
           </div>
-          <form className="flex w-full max-w-sm gap-2">
-            <input
-              type="email"
-              placeholder="you@email.com"
-              className="w-full rounded-full border border-line bg-ink-2 px-5 py-3 text-sm text-bone placeholder:text-bone-faint focus:border-bone/40 focus:outline-none"
-            />
-            <button
-              type="submit"
-              className="shrink-0 rounded-full bg-bone px-6 py-3 text-sm font-medium text-ink transition-colors hover:bg-salt"
-            >
-              Notify me
-            </button>
-          </form>
+          <NewsletterForm />
         </div>
 
         {/* Columns */}
@@ -94,18 +90,32 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Baseline */}
-        <div className="flex flex-col gap-4 border-t border-line pt-8 text-xs text-bone-faint md:flex-row md:items-center md:justify-between">
-          <span className="font-mono-jb">
-            © {new Date().getFullYear()} NAMAKH — Made with{" "}
-            <span className="text-salt">✶</span> in India
-          </span>
-          <div className="flex gap-6">
-            {["Instagram", "Twitter", "Facebook"].map((s) => (
-              <Link key={s} href="#" className="link-reveal hover:text-bone">
-                {s}
-              </Link>
-            ))}
+        <div className="flex flex-col gap-4 border-t border-line pt-8 text-xs text-bone-faint md:flex-row md:items-start md:justify-between">
+          <div className="space-y-2">
+            <p className="font-mono-jb">
+              © {new Date().getFullYear()} NAMAKH — Made with{" "}
+              <span className="text-salt">✶</span> in India
+            </p>
+            <p className="max-w-2xl leading-relaxed">
+              Namakh · Harsh Nilesh Nisar (sole proprietor) · No. 61, Perumal
+              Koil Street, Puducherry 605001 · FSSAI Lic. No. 23526001000347
+            </p>
           </div>
+          {SOCIALS.length > 0 && (
+            <div className="flex gap-6">
+              {SOCIALS.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link-reveal hover:text-bone"
+                >
+                  {social.label}
+                </a>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </footer>

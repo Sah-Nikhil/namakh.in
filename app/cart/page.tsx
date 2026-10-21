@@ -127,7 +127,7 @@ export default function CartPage() {
                   Proceed to checkout
                 </Link>
                 <p className="mt-3 text-center text-xs text-bone-faint">
-                  {shippingPromise()} &middot; dispatched in 24&ndash;48 hours
+                  {shippingPromise()} &middot; dispatched in 2&ndash;3 business days
                 </p>
               </div>
             </div>

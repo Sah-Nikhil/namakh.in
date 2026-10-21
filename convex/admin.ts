@@ -1,37 +1,55 @@
 import { v } from "convex/values";
 import { paginationOptsValidator, paginationResultValidator } from "convex/server";
-import { getAuthUserId } from "@convex-dev/auth/server";
+import { getAuthSessionId, getAuthUserId } from "@convex-dev/auth/server";
 import { mutation, query } from "./_generated/server";
 import type { QueryCtx, MutationCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { appendEvent, queueShiprocketPush } from "./orders";
 import { orderLine, orderStatus, orderTotals, shippingAddress } from "./schema";
+import { isAdminEmail } from "./adminAllowlist";
 
 /**
  * The admin panel's backend.
  *
- * Signing up is not the same as being let in. Convex Auth will happily create
- * an account for any email; every function here re-checks that email against
- * ADMIN_EMAILS before returning a single customer address. The allowlist is
- * the authorisation, the account is only the identity.
+ * Sign-in already refuses anyone off the allowlist (convex/auth.ts), but every
+ * function here re-checks the email against ADMIN_EMAILS before returning a
+ * single customer address. An account left over from the old password sign-in,
+ * or an email removed from the list later, must still be turned away.
  */
 
-function allowedEmails(): string[] {
-  return (process.env.ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((email) => email.trim().toLowerCase())
-    .filter(Boolean);
-}
-
-async function requireAdmin(ctx: QueryCtx | MutationCtx): Promise<string> {
+/**
+ * The signed-in admin's email, or null.
+ *
+ * Three checks beyond "has a token":
+ * - The session behind the token still exists and hasn't expired. A JWT stays
+ *   valid for up to an hour after its session is deleted, and the first code
+ *   sign-in deletes sessions left over from the old password sign-in.
+ * - `emailVerificationTime` is set, which only an emailed-code sign-in does
+ *   (convex/auth.ts). A row only reached through the old password sign-in
+ *   never proved it owns the inbox.
+ * - The email is on the allowlist right now.
+ */
+async function currentAdminEmail(ctx: QueryCtx | MutationCtx): Promise<string | null> {
   const userId = await getAuthUserId(ctx);
-  if (!userId) throw new Error("Sign in to view orders.");
+  const sessionId = await getAuthSessionId(ctx);
+  if (!userId || !sessionId) return null;
+
+  const session = await ctx.db.get("authSessions", sessionId);
+  if (!session || session.userId !== userId || session.expirationTime <= Date.now()) {
+    return null;
+  }
 
   const user = await ctx.db.get("users", userId);
   const email = user?.email?.toLowerCase();
-  if (!email || !allowedEmails().includes(email)) {
-    throw new Error("This account is not allowed to view orders.");
+  if (!email || !isAdminEmail(email) || user?.emailVerificationTime === undefined) {
+    return null;
   }
+  return email;
+}
+
+async function requireAdmin(ctx: QueryCtx | MutationCtx): Promise<string> {
+  const email = await currentAdminEmail(ctx);
+  if (!email) throw new Error("This account is not allowed to view orders. Sign in again.");
   return email;
 }
 
@@ -40,14 +58,8 @@ export const me = query({
   args: {},
   returns: v.union(v.object({ email: v.string() }), v.null()),
   handler: async (ctx) => {
-    const userId = await getAuthUserId(ctx);
-    if (!userId) return null;
-
-    const user = await ctx.db.get("users", userId);
-    const email = user?.email?.toLowerCase();
-    if (!email || !allowedEmails().includes(email)) return null;
-
-    return { email };
+    const email = await currentAdminEmail(ctx);
+    return email ? { email } : null;
   },
 });
 
@@ -246,5 +258,29 @@ export const retryShiprocketPush = mutation({
     const fresh = await ctx.db.get("orders", order._id);
     if (fresh) await queueShiprocketPush(ctx, fresh);
     return null;
+  },
+});
+
+const subscriberRow = v.object({
+  email: v.string(),
+  source: v.union(v.literal("footer"), v.literal("checkout")),
+  createdAt: v.number(),
+});
+
+/**
+ * The newsletter list, newest first, for the panel's Subscribers tab and its
+ * CSV export. Capped well above what a launch-stage store will collect.
+ */
+export const listSubscribers = query({
+  args: {},
+  returns: v.array(subscriberRow),
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+    const rows = await ctx.db.query("subscribers").order("desc").take(5000);
+    return rows.map((row) => ({
+      email: row.email,
+      source: row.source,
+      createdAt: row._creationTime,
+    }));
   },
 });

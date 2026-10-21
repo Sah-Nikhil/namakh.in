@@ -64,7 +64,7 @@ export default function PaymentBlock({
       <Option
         active={method === "razorpay"}
         onSelect={() => onChange("razorpay")}
-        title="Pay online"
+        title="Pay securely with Razorpay"
         meta={
           <span className="hidden gap-1.5 sm:flex">
             {RAILS.map((rail) => (
@@ -82,14 +82,13 @@ export default function PaymentBlock({
           <IconLock className="mt-0.5 h-4 w-4 shrink-0" />
           {PAYMENTS_LIVE ? (
             <span>
-              You will be taken to our secure payment partner to complete the payment. Namakh
-              never stores your card or UPI details.
+              You will complete the payment in Razorpay&rsquo;s secure window. Namakh never sees or
+              stores your card or UPI details.
             </span>
           ) : (
             <span>
-              Our payment gateway is being activated. Place the order now and we will email a
-              secure payment link to complete it, usually within a few hours. Nothing is charged
-              at this step.
+              Payments are processed securely by Razorpay. Namakh never sees or stores your
+              card or UPI details.
             </span>
           )}
         </p>
@@ -117,7 +116,7 @@ export default function PaymentBlock({
 
       <p className="flex items-center gap-2 pt-1 text-xs text-bone-faint">
         <IconShieldCheck className="h-4 w-4" />
-        Your details are used for this order only. See our{" "}
+        Your details are handled as set out in our{" "}
         <a href="/privacy" className="underline underline-offset-2 hover:text-bone">
           privacy policy
         </a>

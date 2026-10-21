@@ -4,7 +4,9 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { CartProvider } from "@/components/cart/cart-context";
 import StorefrontCart from "@/components/cart/storefront-cart";
+import { QuizProvider } from "@/components/quiz/quiz-context";
 import { Analytics } from "@vercel/analytics/next";
+import { SEARCH_INDEXING } from "@/lib/site";
 
 // Body / UI grotesque
 const geistSans = Geist({
@@ -31,6 +33,8 @@ export const metadata: Metadata = {
   title: "Namakh — Electrolytes, done right.",
   description:
     "Precision-formulated electrolytes. No nonsense. Two blends, engineered for how you actually live and train.",
+  // Kept out of search until Razorpay approves the store. See lib/site.ts.
+  robots: SEARCH_INDEXING ? undefined : { index: false, follow: false },
 };
 
 export default function RootLayout({
@@ -45,8 +49,10 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark">
           <CartProvider>
-            {children}
-            <StorefrontCart />
+            <QuizProvider>
+              {children}
+              <StorefrontCart />
+            </QuizProvider>
           </CartProvider>
         </ThemeProvider>
       </body>

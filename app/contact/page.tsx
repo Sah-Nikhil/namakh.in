@@ -106,15 +106,24 @@ export default function ContactPage() {
           </Field>
           <Field label="/ Registered Address">
             <address className="not-italic text-sm text-bone-dim leading-relaxed">
-              No. 61, Perumal Koil Street
+              No. 61, Perumal Koil Street,
               <br />
-              Puducherry – 605001
+              Puducherry – 605001,
               <br />
               India
             </address>
           </Field>
           <Field label="/ FSSAI Licence">
             <span className="font-mono text-sm">23526001000347</span>
+          </Field>
+          <Field label="/ Grievance Officer">
+            <p className="text-sm text-bone-dim">
+              Grievance Officer: Harsh Nilesh Nisar,{" "}
+              <a href={`mailto:${EMAIL}`} className="break-all">
+                {EMAIL}
+              </a>
+              . We reply within 48 hours.
+            </p>
           </Field>
         </div>
       </DocSection>
@@ -128,7 +137,8 @@ export default function ContactPage() {
 
         <h3 className="doc-h3">Returns &amp; Refunds</h3>
         <p>
-          Need to report a damaged product or request a refund? Please include:
+          Need to report a damaged product or request a refund? Damaged parcels
+          must be reported within 48 hours of delivery. Please include:
         </p>
         <ul>
           <li>Order Number</li>

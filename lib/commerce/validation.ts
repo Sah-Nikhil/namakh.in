@@ -12,6 +12,7 @@ export function normalisePhone(raw: string): string {
 
 export function validateEmail(value: string): string | undefined {
   if (!value.trim()) return "Email is required.";
+  if (value.trim().length > 254) return "Enter a valid email address.";
   if (!EMAIL.test(value.trim())) return "Enter a valid email address.";
   return undefined;
 }

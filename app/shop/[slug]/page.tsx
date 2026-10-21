@@ -10,6 +10,7 @@ import MobileNav from "@/components/mobile-nav";
 import Footer from "@/components/ui/footer-modern";
 import { motion } from "framer-motion";
 import AddToCart from "@/components/cart/add-to-cart";
+import { COMMERCE } from "@/lib/commerce/config";
 
 export default function ProductPage({
   params,
@@ -176,6 +177,52 @@ export default function ProductPage({
                 </div>
               </details>
             </div>
+
+            {/* Product information. Seller details only for now.
+                TODO(pack-photos): add net quantity, ingredients, nutrition and
+                best-before once the client sends photos of the final packs.
+                Don't fill these in from guesses. */}
+            <section className="mt-2 border-t border-line pt-6">
+              <h2 className="kicker">/ Product information</h2>
+              <dl className="mt-4 space-y-3 text-sm leading-relaxed">
+                <div>
+                  <dt className="text-bone-faint">Manufacturer</dt>
+                  <dd className="text-bone-dim">
+                    Manufactured and sold by Harsh Nilesh Nisar (Namakh)
+                    <br />
+                    {COMMERCE.business.address}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-bone-faint">Licence</dt>
+                  <dd className="font-mono-jb text-bone-dim">
+                    FSSAI Lic. No. {COMMERCE.business.fssaiLicence}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-bone-faint">Origin</dt>
+                  <dd className="text-bone-dim">Country of origin: India</dd>
+                </div>
+                <div>
+                  <dt className="text-bone-faint">Customer care</dt>
+                  <dd className="text-bone-dim">
+                    <a
+                      href={`mailto:${COMMERCE.support.email}`}
+                      className="link-reveal break-all hover:text-bone"
+                    >
+                      {COMMERCE.support.email}
+                    </a>
+                    <br />
+                    <a
+                      href={`tel:${COMMERCE.support.phone.replace(/\s/g, "")}`}
+                      className="link-reveal hover:text-bone"
+                    >
+                      {COMMERCE.support.phone}
+                    </a>
+                  </dd>
+                </div>
+              </dl>
+            </section>
           </div>
         </div>
       </main>

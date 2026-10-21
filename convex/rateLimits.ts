@@ -4,26 +4,25 @@ import { components } from "./_generated/api";
 const MINUTE = 60_000;
 
 /**
- * Brute-force protection for the admin sign-in.
+ * Abuse limits, one bucket per thing worth protecting.
  *
- * Two limits, because they stop different attacks. The per-email bucket stops
- * someone grinding passwords against one known admin address. The global
- * bucket stops the same attacker spreading attempts across many addresses to
- * stay under that first limit.
- *
- * Token buckets rather than fixed windows: an admin who fumbles their password
- * three times and gets it right on the fourth is not locked out for the rest of
- * the window, and the allowance refills gradually instead of all at once.
+ * Token buckets rather than fixed windows: someone who trips a limit is not
+ * locked out for the rest of a window, and the allowance refills gradually
+ * instead of all at once.
  */
 export const rateLimiter = new RateLimiter(components.rateLimiter, {
-  /** One person, one email. Five tries, refilling over five minutes. */
+  /**
+   * Requests for an admin sign-in code, per email. Only allowlisted emails get
+   * a code at all; this stops anyone flooding an admin's inbox with them.
+   * Wrong codes are limited by Convex Auth itself (see convex/auth.ts).
+   */
   adminSignInPerEmail: {
     kind: "token bucket",
     rate: 5,
     period: 5 * MINUTE,
     capacity: 5,
   },
-  /** Everyone, everywhere. Generous for real use, ruinous for a spray. */
+  /** Code requests from everyone, everywhere. */
   adminSignInGlobal: {
     kind: "token bucket",
     rate: 40,
@@ -55,6 +54,16 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
   },
   /** Everyone, everywhere. Far above a launch-day rush, well below a spray. */
   checkoutGlobal: {
+    kind: "token bucket",
+    rate: 30,
+    period: MINUTE,
+    capacity: 30,
+  },
+  /**
+   * Footer newsletter sign-ups. Nothing is emailed on sign-up, so the risk is
+   * only junk rows in the list; one generous global bucket covers it.
+   */
+  newsletterGlobal: {
     kind: "token bucket",
     rate: 30,
     period: MINUTE,

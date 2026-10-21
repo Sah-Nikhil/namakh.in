@@ -160,4 +160,14 @@ export default defineSchema({
       v.literal("manual"),
     ),
   }).index("by_orderId", ["orderId"]),
+
+  /**
+   * People who asked for news: the footer form, or the opt-in box at checkout.
+   * One row per email; signing up again changes nothing. Nothing is
+   * sent from here yet. The list is read and exported from the admin panel.
+   */
+  subscribers: defineTable({
+    email: v.string(),
+    source: v.union(v.literal("footer"), v.literal("checkout")),
+  }).index("by_email", ["email"]),
 });

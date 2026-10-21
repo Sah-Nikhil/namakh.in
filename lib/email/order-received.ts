@@ -16,6 +16,8 @@ const escapeHtml = (value: string) =>
  */
 export function orderReceivedEmail(order: PlacedOrder, origin: string) {
   const trackUrl = `${origin}${trackingPath(order.orderNumber, order.trackToken)}`;
+  const biz = COMMERCE.business;
+  const seller = `${biz.brand} · ${biz.legalName} (sole proprietor) · ${biz.address} · FSSAI Lic. No. ${biz.fssaiLicence}`;
   const firstName = order.address.fullName.trim().split(/\s+/)[0] || "there";
   // TODO(PAYMENTS_LIVE): once Razorpay is wired, a prepaid buyer pays in the
   // checkout modal. Send a "payment received" email from recordPayment then,
@@ -25,7 +27,7 @@ export function orderReceivedEmail(order: PlacedOrder, origin: string) {
       ? "It is cash on delivery, so there is nothing to pay now. We will pack it shortly."
       : PAYMENTS_LIVE
         ? "We will pack it as soon as your payment is confirmed."
-        : "Our payment gateway is being activated. We will email you a secure payment link as soon as it is ready. Nothing has been charged.";
+        : "It is waiting for payment, and nothing has been charged yet.";
 
   const rows = order.lines
     .map(
@@ -56,6 +58,7 @@ export function orderReceivedEmail(order: PlacedOrder, origin: string) {
     <p style="margin:0 0 24px">${address}</p>
     <a href="${trackUrl}" style="display:inline-block;background:#111;color:#fff;text-decoration:none;padding:12px 20px;border-radius:6px">Track your order</a>
     <p style="margin:24px 0 0;color:#777;font-size:13px">Questions? Write to <a href="mailto:${COMMERCE.support.email}" style="color:#777">${COMMERCE.support.email}</a> or call ${COMMERCE.support.phone}.</p>
+    <p style="margin:12px 0 0;color:#999;font-size:12px">${seller}</p>
   </div>
 </body></html>`;
 
@@ -70,6 +73,8 @@ export function orderReceivedEmail(order: PlacedOrder, origin: string) {
     `Track your order: ${trackUrl}`,
     "",
     `Questions? ${COMMERCE.support.email} / ${COMMERCE.support.phone}`,
+    "",
+    seller,
   ].join("\n");
 
   return { subject: `Order ${order.orderNumber} received`, html, text };

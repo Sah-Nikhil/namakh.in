@@ -1,14 +1,14 @@
 /**
  * Commerce configuration — every number the checkout adds up lives here.
  *
- * Settled with the client on 2026-09-15: prices are GST-inclusive, and
+ * Settled with the client on 2026-09-15: prices are final as listed, and
  * shipping is charged, calculated at checkout (rates still to be supplied).
  * COD stays off. Changing the business rules is an edit to this file, not to
  * any component.
  */
 
 export type ShippingMode = "free" | "flat" | "threshold" | "live";
-export type TaxMode = "inclusive" | "exclusive";
+export type TaxMode = "none" | "inclusive" | "exclusive";
 
 export const COMMERCE = {
   currencyCode: "INR",
@@ -27,19 +27,21 @@ export const COMMERCE = {
     freeAbove: 999,
     /** Delivery window quoted at checkout, in business days. */
     etaDays: [3, 6] as const,
-    dispatchNote: "Dispatched within 24–48 hours of order confirmation.",
+    dispatchNote: "Dispatched within 2–3 business days of order confirmation.",
   },
 
   tax: {
     /**
-     * Decided 2026-09-15: inclusive. Not a placeholder — do not flip without
-     * the client, it changes every price a buyer has already seen.
+     * "none" since 2026-10-21: the business is not GST registered, so no GST
+     * is charged or mentioned and no GSTIN is shown. Before that it was
+     * "inclusive". Do not flip without the client and a GSTIN.
      *
+     * "none"      — no tax line, no tax note. Prices are final.
      * "inclusive" — prices in lib/products.ts already contain GST. No tax
-     *               line, just a note. Standard for Indian D2C.
+     *               line, just an "Inclusive of GST" note.
      * "exclusive" — GST is added on top and shown as its own line.
      */
-    mode: "inclusive" as TaxMode,
+    mode: "none" as TaxMode,
     ratePct: 18,
     label: "GST",
   },
@@ -110,6 +112,20 @@ export const COMMERCE = {
   support: {
     email: "hydratewithnamakh@gmail.com",
     phone: "+91 95439 90007",
+  },
+
+  /**
+   * The seller, as given by the client on 2026-10-21. A sole proprietorship,
+   * not GST registered. The registered address is the only address shown to
+   * buyers; the Auroville pickup address appears only in the Shipping Policy.
+   */
+  business: {
+    legalName: "Harsh Nilesh Nisar",
+    brand: "Namakh",
+    address: "No. 61, Perumal Koil Street, Puducherry 605001, India",
+    fssaiLicence: "23526001000347",
+    /** Issued 19 March 2026. Renew before this date; not shown on the site. */
+    fssaiValidUntil: "2028-03-18",
   },
 
   /** Only market served today. The address form is built around it. */

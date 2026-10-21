@@ -99,7 +99,7 @@ export default function CheckoutSuccessPage() {
               <p className="mt-5 max-w-xl text-lg text-bone-dim">
                 {PAYMENTS_LIVE
                   ? "Your payment is confirmed and your order is in our dispatch queue."
-                  : "Your order is saved and held for payment. We will email you a secure payment link shortly, and pack it the moment payment lands."}
+                  : "Your order is saved and waiting for payment. Nothing has been charged yet."}
               </p>
 
               <dl className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-3">

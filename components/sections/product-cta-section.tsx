@@ -4,19 +4,16 @@ import Link from "next/link";
 import Image from "next/image";
 import Reveal from "@/components/ui/reveal";
 import { products } from "@/lib/products";
-
-interface ProductCTASectionProps {
-  onQuizClick: () => void;
-}
+import { useQuiz } from "@/components/quiz/quiz-context";
 
 const ACCENT: Record<string, string> = {
   "hydration-blend": "var(--color-hydration)",
   "sports-blend": "var(--color-sports)",
 };
 
-export default function ProductCTASection({
-  onQuizClick,
-}: ProductCTASectionProps) {
+export default function ProductCTASection() {
+  const quiz = useQuiz();
+
   return (
     <section
       id="blends"
@@ -114,7 +111,8 @@ export default function ProductCTASection({
               actually needs.
             </p>
             <button
-              onClick={onQuizClick}
+              type="button"
+              onClick={quiz.open}
               className="group mt-9 inline-flex items-center gap-3 rounded-full bg-bone px-8 py-4 font-medium text-ink transition-all hover:gap-4 hover:bg-salt"
             >
               Take the 60-second quiz

@@ -2,43 +2,65 @@
 
 import { useState } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { IconLoader2, IconLock } from "@tabler/icons-react";
+import { ConvexError } from "convex/values";
+import { IconLoader2, IconLock, IconMail } from "@tabler/icons-react";
 import { TextField } from "@/components/checkout/field";
 
 /**
- * Sign-in for the order panel. Both flows are here because someone has to
- * create the first account, but creating one grants nothing on its own — the
- * allowlist in convex/admin.ts decides who actually sees an order.
+ * Sign-in for the order panel: an allowlisted email, then a 6-digit code sent
+ * to that inbox. There is no sign-up. Only emails in ADMIN_EMAILS get a code,
+ * and convex/admin.ts re-checks the allowlist on every call.
  */
+
+/** The sentence we wrote on the server, without Convex's framing around it. */
+function messageFrom(caught: unknown, fallback: string): string {
+  if (caught instanceof ConvexError && typeof caught.data === "string") return caught.data;
+  const raw = caught instanceof Error ? caught.message : "";
+  const known = raw.match(
+    /(Too many sign-in attempts[^\n"]*|This email cannot sign in[^\n"]*|Could not send the code[^\n"]*|Sign-in email is not set up[^\n"]*)/,
+  );
+  return known ? known[0] : fallback;
+}
+
 export default function AdminSignIn({ notAllowed }: { notAllowed: boolean }) {
   const { signIn } = useAuthActions();
-  const [flow, setFlow] = useState<"signIn" | "signUp">("signIn");
+  const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const submit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const normalisedEmail = email.trim().toLowerCase();
+
+  const sendCode = async () => {
     setBusy(true);
     setError(null);
     try {
-      await signIn("password", { email, password, flow });
+      await signIn("admin-code", { email: normalisedEmail });
+      setCode("");
+      setStep("code");
     } catch (caught) {
-      // Being rate limited is not the same as getting the password wrong, and
-      // saying so would send someone hunting for a password that is correct.
-      const raw = caught instanceof Error ? caught.message : "";
-      const limited = raw.match(/Too many sign-in attempts[^\n"]*/);
-      setError(
-        limited
-          ? limited[0]
-          : flow === "signIn"
-            ? "That email and password did not match."
-            : "Could not create that account. The password needs at least 8 characters.",
-      );
+      setError(messageFrom(caught, "Could not send the code. Try again."));
     } finally {
       setBusy(false);
     }
+  };
+
+  const verify = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await signIn("admin-code", { email: normalisedEmail, code: code.trim() });
+    } catch (caught) {
+      setError(messageFrom(caught, "That code did not work. Check it, or send a new one."));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const submit = (event: React.FormEvent) => {
+    event.preventDefault();
+    void (step === "email" ? sendCode() : verify());
   };
 
   return (
@@ -47,9 +69,9 @@ export default function AdminSignIn({ notAllowed }: { notAllowed: boolean }) {
         <span className="kicker">/ Namakh</span>
         <h1 className="display-xl mt-4 text-3xl text-bone">Order panel</h1>
         <p className="mt-3 text-sm text-bone-dim">
-          {flow === "signIn"
-            ? "Sign in to see orders as they come in."
-            : "Create your account. Access is granted separately, by email."}
+          {step === "email"
+            ? "Enter your admin email and we will send you a sign-in code."
+            : `We sent a 6-digit code to ${normalisedEmail}. It expires in 10 minutes.`}
         </p>
 
         {notAllowed && (
@@ -63,24 +85,28 @@ export default function AdminSignIn({ notAllowed }: { notAllowed: boolean }) {
         )}
 
         <form onSubmit={submit} className="mt-7 space-y-4">
-          <TextField
-            id="admin-email"
-            label="Email"
-            value={email}
-            onChange={setEmail}
-            type="email"
-            autoComplete="email"
-            placeholder="you@namakh.in"
-          />
-          <TextField
-            id="admin-password"
-            label="Password"
-            value={password}
-            onChange={setPassword}
-            type="password"
-            autoComplete={flow === "signIn" ? "current-password" : "new-password"}
-            placeholder="••••••••"
-          />
+          {step === "email" ? (
+            <TextField
+              id="admin-email"
+              label="Email"
+              value={email}
+              onChange={setEmail}
+              type="email"
+              autoComplete="email"
+              placeholder="you@namakh.in"
+            />
+          ) : (
+            <TextField
+              id="admin-code"
+              label="Code"
+              value={code}
+              onChange={(v) => setCode(v.replace(/\D/g, "").slice(0, 6))}
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="123456"
+              maxLength={6}
+            />
+          )}
 
           {error && (
             <p role="alert" className="text-xs text-[var(--color-sports)]">
@@ -90,28 +116,42 @@ export default function AdminSignIn({ notAllowed }: { notAllowed: boolean }) {
 
           <button
             type="submit"
-            disabled={busy}
+            disabled={busy || (step === "email" ? !normalisedEmail : code.length !== 6)}
             className="flex w-full items-center justify-center gap-2 rounded-full bg-bone py-3.5 text-sm font-medium text-ink transition-colors hover:bg-salt disabled:cursor-not-allowed disabled:opacity-60"
           >
             {busy ? (
               <IconLoader2 className="h-4 w-4 animate-spin" />
+            ) : step === "email" ? (
+              <IconMail className="h-4 w-4" />
             ) : (
               <IconLock className="h-4 w-4" />
             )}
-            {flow === "signIn" ? "Sign in" : "Create account"}
+            {step === "email" ? "Send code" : "Sign in"}
           </button>
         </form>
 
-        <button
-          type="button"
-          onClick={() => {
-            setFlow(flow === "signIn" ? "signUp" : "signIn");
-            setError(null);
-          }}
-          className="mt-5 w-full text-center text-xs text-bone-faint underline underline-offset-4 transition-colors hover:text-bone-dim"
-        >
-          {flow === "signIn" ? "Need an account?" : "Already have an account?"}
-        </button>
+        {step === "code" && (
+          <div className="mt-5 flex justify-between text-xs">
+            <button
+              type="button"
+              onClick={() => {
+                setStep("email");
+                setError(null);
+              }}
+              className="text-bone-faint underline underline-offset-4 transition-colors hover:text-bone-dim"
+            >
+              Use a different email
+            </button>
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => void sendCode()}
+              className="text-bone-faint underline underline-offset-4 transition-colors hover:text-bone-dim disabled:opacity-50"
+            >
+              Send a new code
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import { computeTotals, codAvailable, shippingNeedsQuote } from "../lib/commerce
 import { parcelFor } from "../lib/shiprocket/parcel";
 import { hasErrors, validateDraft } from "../lib/commerce/validation";
 import { rateLimiter } from "./rateLimits";
+import { addSubscriber } from "./newsletter";
 
 /**
  * Order creation lives here, not in the Next.js route, so that prices are
@@ -210,6 +211,10 @@ export const place = mutation({
     });
 
     await appendEvent(ctx, orderId, status, "Order placed", "system");
+
+    if (args.draft.marketingOptIn) {
+      await addSubscriber(ctx, args.draft.email, "checkout");
+    }
 
     // A cash-on-delivery order needs no payment before it ships, so it goes
     // straight to Shiprocket. Prepaid orders wait for payment (see below).

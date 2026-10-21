@@ -3,9 +3,11 @@ import React, { useState } from "react";
 import { motion, useTransform, useMotionValue, MotionValue } from "framer-motion";
 import { Menu, MenuItem, ProductItem } from "@/components/ui/navbar-menu";
 import { cn } from "@/lib/utils";
+import { useQuiz } from "@/components/quiz/quiz-context";
 
-export default function Navbar({ className, onQuizClick, scrollY }: { className?: string; onQuizClick?: () => void; scrollY?: MotionValue<number> }) {
+export default function Navbar({ className, scrollY }: { className?: string; scrollY?: MotionValue<number> }) {
   const [active, setActive] = useState<string | null>(null);
+  const quiz = useQuiz();
 
   // Create a dummy motion value for when scrollY is not provided
   // This ensures hooks are always called in the same order
@@ -26,19 +28,20 @@ export default function Navbar({ className, onQuizClick, scrollY }: { className?
           <ProductItem
             title="Sports Blend"
             href="/shop/sports-blend"
-            src="/assets/sports_logo.png"
+            src="/assets/sport.jpeg"
             description="FUEL. SWEAT. REPEAT."
           />
           <ProductItem
             title="Hydration Blend"
             href="/shop/hydration-blend"
-            src="/assets/hydration_logo.png"
+            src="/assets/hydration.jpeg"
             description="PURE. DAILY. ESSENTIAL."
           />
         </div>
       </MenuItem>
       <button
-        onClick={onQuizClick}
+        type="button"
+        onClick={quiz.open}
         className="cursor-pointer text-black hover:opacity-[0.9]"
       >
         Find Your Blend

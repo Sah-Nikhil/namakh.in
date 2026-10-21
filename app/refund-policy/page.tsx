@@ -33,7 +33,7 @@ export default function RefundPolicyPage() {
       title="Refund & Return"
       titleAccent="Policy."
       intro="Simple, fair, and transparent returns."
-      updated="14 July 2026"
+      updated="21 October 2026"
       toc={TOC}
     >
       <Reveal>
@@ -55,17 +55,31 @@ export default function RefundPolicyPage() {
       </Reveal>
 
       <DocSection id="eligible" title="Eligible for a Replacement or Refund">
+        <h3 className="doc-h3">Damaged in transit</h3>
         <p>You may be eligible for a replacement or refund if:</p>
         <ul>
-          <li>You receive the wrong product.</li>
           <li>Your order arrives damaged during transit.</li>
           <li>The product seal is broken or tampered with upon delivery.</li>
           <li>The product arrives in an unusable condition.</li>
           <li>The order is incomplete or items are missing.</li>
+        </ul>
+        <p>
+          Report it within <strong>48 hours of delivery</strong>, with photos of
+          the package and the product, by emailing{" "}
+          <a href="mailto:hydratewithnamakh@gmail.com">
+            hydratewithnamakh@gmail.com
+          </a>
+          . We can’t accept damage claims made after 48 hours or without photos.
+        </p>
+
+        <h3 className="doc-h3">Wrong product or defect</h3>
+        <p>You may also be eligible for a replacement or refund if:</p>
+        <ul>
+          <li>You receive the wrong product.</li>
           <li>The product has a manufacturing defect.</li>
         </ul>
         <p>
-          To be eligible, please contact us within{" "}
+          For these, please contact us within{" "}
           <strong>7 days of receiving your order</strong>.
         </p>
       </DocSection>
@@ -171,7 +185,11 @@ export default function RefundPolicyPage() {
             Normal wear to external packaging during shipping that does not
             affect the product itself.
           </li>
-          <li>Requests submitted more than 7 days after delivery.</li>
+          <li>
+            Damage, tampering, or missing items reported more than 48 hours
+            after delivery, or without photos.
+          </li>
+          <li>Other requests submitted more than 7 days after delivery.</li>
           <li>
             Orders with incorrect delivery information provided by the customer.
           </li>
@@ -196,7 +214,10 @@ export default function RefundPolicyPage() {
           <li>Your order number.</li>
           <li>Your full name.</li>
           <li>A description of the issue.</li>
-          <li>Relevant photographs or videos (if applicable).</li>
+          <li>
+            Photos of the package and the product (required for damaged
+            parcels).
+          </li>
         </ul>
         <p>Our team aims to respond within 1–2 business days.</p>
       </DocSection>

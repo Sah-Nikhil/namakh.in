@@ -158,9 +158,9 @@ export default function CartDrawer() {
                   </span>
                 </div>
                 <p className="mt-1 text-xs text-bone-faint">
-                  {COMMERCE.tax.mode === "inclusive"
-                    ? "Inclusive of all taxes. Shipping calculated at checkout."
-                    : `${COMMERCE.tax.label} and shipping calculated at checkout.`}
+                  {COMMERCE.tax.mode === "exclusive"
+                    ? `${COMMERCE.tax.label} and shipping calculated at checkout.`
+                    : "Shipping calculated at checkout."}
                 </p>
 
                 <Link

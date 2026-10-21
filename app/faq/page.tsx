@@ -46,16 +46,12 @@ const TABS: DocTab[] = [
     content: (
       <Panel title="Products">
         <QA q="What’s the difference between Hydration and Sports Blends?">
-            {/* , and Heart Blend */}
           <p>
             Hydration Blend is for everyday use, no added sugar, built for daily
             fluid balance. Sports Blend is dosed higher and includes a small
             amount of dextrose to help your body absorb electrolytes faster
             during intense training or competition.
           </p>
-          {/* Heart Blend is formulated
-            with a different sodium-to-potassium ratio, aimed at people mindful
-            of blood pressure and cardiovascular health. */}
         </QA>
 
         <QA q="Which blend is right for me?">
@@ -64,9 +60,8 @@ const TABS: DocTab[] = [
             start with Hydration Blend. If you train intensely or compete, like
             ultimate frisbee, running, or team sports, Sports Blend is built for
             that output. If you’re managing blood pressure or have been advised
-            to watch your sodium/potassium intake, talk to your doctor about
-            whether Heart Blend fits, since it’s formulated differently from the
-            other two.
+            to watch your sodium or potassium intake, talk to your doctor before
+            using either blend.
           </p>
         </QA>
 
@@ -79,12 +74,13 @@ const TABS: DocTab[] = [
           </p>
         </QA>
 
-        <QA q="Is Namakh vegan / allergen-free?">
+        <QA q="Is Namakh vegan? What about allergens?">
           <p>
             Yes, Namakh products are vegan. All ingredients are mineral or
             plant-derived, with nothing animal-sourced. Namakh products also
-            contain no known allergens. Check the ingredient list on your
-            specific product label for full details.
+            contain no added allergens, and our ingredients are third-party
+            tested. Check the ingredient list on your specific product label for
+            full details.
           </p>
         </QA>
       </Panel>
@@ -111,9 +107,9 @@ const TABS: DocTab[] = [
             simply don’t get enough electrolytes through diet alone, and that
             higher dose supports performance and recovery whether or not that
             particular day includes intense training. Sports Blend is perfect on
-            days when you’re sweating heavily or just have, and need to
-            replenish what you lost. On days you’re not sweating much, Hydration
-            Blend is the better fit.
+            days when you’re sweating heavily and need to replenish what you
+            lost. On days you’re not sweating much, Hydration Blend is the better
+            fit.
           </p>
         </QA>
 
@@ -138,15 +134,21 @@ const TABS: DocTab[] = [
       <Panel title="Orders & Shipping">
         <QA q="How long does shipping take?">
           <p>
-            We aim to dispatch orders within 2 to 3 business days. Delivery
-            timelines after that depend on your location and courier schedules.
+            We aim to dispatch orders within 2 to 3 business days of payment.
+            Delivery timelines after that depend on your location and courier
+            schedules.
           </p>
         </QA>
 
         <QA q="What’s your return policy?">
           <p>
-            See our <a href="/refund-policy">Refund Policy</a> page for full
-            details on returns, replacements, and refunds.
+            If your parcel arrives damaged, email us at{" "}
+            <a href="mailto:hydratewithnamakh@gmail.com">
+              hydratewithnamakh@gmail.com
+            </a>{" "}
+            with photos within 48 hours of delivery. For anything else, such as
+            a wrong product or an unopened return, you have 7 days. See our{" "}
+            <a href="/refund-policy">Refund Policy</a> page for full details.
           </p>
         </QA>
 
@@ -177,9 +179,10 @@ const TABS: DocTab[] = [
           </p>
         </QA>
 
-        <QA q="Is Namakh FSSAI certified?">
+        <QA q="Is Namakh FSSAI licensed?">
           <p>
-            Yes. Namakh is manufactured under FSSAI license no.{" "}
+            Yes. Manufactured and sold by Harsh Nilesh Nisar (Namakh) under FSSAI
+            Lic. No.{" "}
             <span className="font-mono text-bone">23526001000347</span>.
           </p>
         </QA>

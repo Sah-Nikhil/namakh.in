@@ -105,9 +105,10 @@ the published version. If copy changes, change both.
 
 ### The quiz
 The "find your blend" modal (`components/quiz-modal.tsx`). Six questions, each option
-carrying a `score` for both blend keys; the higher total picks the result. Opened
-from the navbar and from `ProductCTASection` via an `onQuizClick` prop threaded down
-from `app/page.tsx`. Entirely client-side, stateless across sessions — nothing is
+carrying a `score` for both blend keys; the higher total picks the result. Mounted once
+by `QuizProvider` (`components/quiz/quiz-context.tsx`) in the root layout, so it opens
+in place on every storefront page (never under `/admin`); the navbar, mobile dock
+and `ProductCTASection` call `useQuiz().open`. Entirely client-side, stateless across sessions — nothing is
 persisted or sent anywhere.
 *Avoid:* survey, questionnaire, finder, recommender, wizard.
 
@@ -227,9 +228,9 @@ Unchanged by commerce: cart lines, order items and the checkout API all address 
 product by its **slug**.
 
 ### Admin
-Someone allowed to see orders. Identified by a Convex Auth account, authorised
-by having their email in the `ADMIN_EMAILS` env var. The two are separate on
-purpose: anyone can create an account, almost nobody is on the list.
+Someone allowed to see orders: an email in the `ADMIN_EMAILS` env var. They
+sign in with a 6-digit **sign-in code** emailed to that address (ADR 0006); an
+email off the list gets no code and no account.
 *Avoid* user (there are no buyer accounts, so "user" is ambiguous), staff, owner.
 
 ### Order panel
@@ -237,6 +238,13 @@ The admin surface at `/admin`. A list of orders with an expandable row. It is
 not a fulfilment system; Shiprocket is. Say "panel", not "dashboard" (the
 Convex dashboard is a different thing and both get discussed).
 *Avoid* dashboard, back office, CMS.
+
+### Subscriber
+An email that asked for news: from the footer "Notify me" form or the opt-in
+box at checkout. Stored in `subscribers`, one row per email, listed in the
+panel's Subscribers tab. Not a buyer account and not the same as the order's
+email.
+*Avoid* lead, contact, member, newsletter user.
 
 ### Shipping quote
 A shipping price for one cart to one PIN code, stored in `shippingQuotes` for

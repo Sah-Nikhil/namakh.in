@@ -9,9 +9,11 @@
  */
 
 import type * as admin from "../admin.js";
+import type * as adminAllowlist from "../adminAllowlist.js";
 import type * as auth from "../auth.js";
 import type * as crons from "../crons.js";
 import type * as http from "../http.js";
+import type * as newsletter from "../newsletter.js";
 import type * as orders from "../orders.js";
 import type * as rateLimits from "../rateLimits.js";
 import type * as shiprocket from "../shiprocket.js";
@@ -24,9 +26,11 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   admin: typeof admin;
+  adminAllowlist: typeof adminAllowlist;
   auth: typeof auth;
   crons: typeof crons;
   http: typeof http;
+  newsletter: typeof newsletter;
   orders: typeof orders;
   rateLimits: typeof rateLimits;
   shiprocket: typeof shiprocket;

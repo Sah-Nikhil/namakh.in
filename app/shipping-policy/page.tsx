@@ -39,7 +39,7 @@ export default function ShippingPolicyPage() {
       title="Shipping"
       titleAccent="Policy."
       intro="Everything you need to know about how your Namakh order reaches you."
-      updated="14 July 2026"
+      updated="21 October 2026"
       toc={TOC}
     >
       <Reveal>
@@ -66,8 +66,11 @@ export default function ShippingPolicyPage() {
         </p>
         <p>
           Once your order has been placed and payment has been successfully
-          received, we aim to process and prepare your order within{" "}
-          <strong>1–2 business days</strong>.
+          received, we aim to dispatch your order{" "}
+          <strong>within 2 to 3 business days of payment</strong>.
+        </p>
+        <p>
+          All orders are dispatched from Auroville, Puducherry 605111.
         </p>
         <p>
           During periods of high demand, product launches, or promotional
@@ -163,7 +166,7 @@ export default function ShippingPolicyPage() {
         </p>
         <p>
           If you do not receive tracking information within{" "}
-          <strong>48 hours</strong> of placing your order, please contact us.
+          <strong>3 business days</strong> of placing your order, please contact us.
         </p>
       </DocSection>
 
@@ -225,24 +228,28 @@ export default function ShippingPolicyPage() {
       </DocSection>
 
       <DocSection id="s9" index={9} title="Damaged or Lost Shipments">
-        <p>If your order arrives:</p>
+        <p>If your order arrives damaged, tampered with, or incomplete:</p>
         <ul>
-          <li>damaged,</li>
-          <li>tampered with,</li>
-          <li>incomplete,</li>
-          <li>or appears to have been lost in transit,</li>
+          <li>
+            report it within <strong>48 hours of delivery</strong>;
+          </li>
+          <li>include photos of the package and the product;</li>
+          <li>
+            email us at{" "}
+            <a href="mailto:hydratewithnamakh@gmail.com">
+              hydratewithnamakh@gmail.com
+            </a>{" "}
+            with your order number.
+          </li>
         </ul>
         <p>
-          please contact us within <strong>48 hours</strong> of delivery (or the
-          expected delivery date for lost shipments).
+          We can’t accept damage claims made after 48 hours or without photos.
+          An unboxing video is not required, but it helps.
         </p>
-        <p>To help us investigate quickly, we may request:</p>
-        <ul>
-          <li>Your order number.</li>
-          <li>Photographs of the package.</li>
-          <li>Photographs of the product.</li>
-          <li>An unboxing video (recommended for transit damage).</li>
-        </ul>
+        <p>
+          If your order appears to have been lost in transit, contact us within{" "}
+          <strong>48 hours of the expected delivery date</strong>.
+        </p>
         <p>
           Once verified, we will work towards providing an appropriate
           resolution, which may include a replacement or refund in accordance
