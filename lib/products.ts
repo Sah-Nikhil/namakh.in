@@ -18,8 +18,20 @@ export type Product = {
   howToUse: string[];
   image: string;
   click: string;
-  /** Nutrition-facts image. Omit until the real label file is in public/assets. */
+  /** Nutrition and ingredients panel, cut from the pack label artwork. */
   nutritionalLabel?: string;
+  /**
+   * Declarations as printed on the pack (label artwork, 2026-10-21). Batch,
+   * manufacturing and use-by dates are per batch, so they stay on the pack.
+   */
+  pack: {
+    netWeight: string;
+    /** Unit price exactly as the label prints it. */
+    unitPrice: string;
+    servingSize: string;
+    ingredients: { name: string; percent: string }[];
+    storage: string;
+  };
   idealFor: string[];
   /**
    * One pack as it leaves the warehouse, box included. Couriers price on this,
@@ -62,6 +74,19 @@ export const products: Product[] = [
     ],
     click: "/assets/hydra.jpeg",
     image: "/assets/hydration.jpeg",
+    nutritionalLabel: "/assets/hydration_nutrition.png",
+    pack: {
+      netWeight: "138.5 g",
+      unitPrice: "₹10.46/g",
+      servingSize: "1 scoop (2.77 g), 50 servings per pack",
+      ingredients: [
+        { name: "Pink Himalayan Salt", percent: "54.98%" },
+        { name: "Potassium Chloride", percent: "27.50%" },
+        { name: "Magnesium Malate", percent: "13.91%" },
+        { name: "Citric Acid", percent: "3.61%" },
+      ],
+      storage: "Store in a cool, dry place away from direct sunlight.",
+    },
     idealFor: ["Daily Hydration", "Light Workouts", "Travel", "Heat"],
     // Weight is the client's figure for the whole filled container (2026-10-20).
     // Box dimensions are still PLACEHOLDERS — replace with measured figures.
@@ -98,6 +123,20 @@ export const products: Product[] = [
     ],
     click: "/assets/sports.jpeg",
     image: "/assets/sport.jpeg",
+    nutritionalLabel: "/assets/sports_nutrition.png",
+    pack: {
+      netWeight: "225.3 g",
+      unitPrice: "₹5.104/g",
+      servingSize: "1 scoop (7.51 g), 30 servings per pack",
+      ingredients: [
+        { name: "Dextrose", percent: "39.95%" },
+        { name: "Pink Himalayan Salt", percent: "33.85%" },
+        { name: "Potassium Chloride", percent: "15.23%" },
+        { name: "Magnesium Malate", percent: "8.56%" },
+        { name: "Citric Acid", percent: "2.40%" },
+      ],
+      storage: "Store in a cool, dry place away from direct sunlight.",
+    },
     idealFor: ["Intense Training", "Endurance Sports", "Heavy Sweating"],
     // Weight is the client's figure for the whole filled container (2026-10-20).
     // Box dimensions are still PLACEHOLDERS — replace with measured figures.

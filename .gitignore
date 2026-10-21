@@ -44,3 +44,8 @@ claude.md
 /.agents/
 /.claude/
 /.claude/launch.json
+
+# Source PDFs (label artwork, invoices) stay local. Anything in public/ is
+# served to the world, and invoices carry customer names and addresses.
+# The site uses images cut from the labels instead (public/assets/*_nutrition.png).
+public/**/*.pdf
