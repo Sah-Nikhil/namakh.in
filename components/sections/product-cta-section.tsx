@@ -61,14 +61,16 @@ export default function ProductCTASection({
                   </span>
                 </div>
 
-                <div className="relative flex h-[300px] md:h-[360px] items-center justify-center p-6">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    width={360}
-                    height={360}
-                    className="h-full w-auto object-contain drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-                  />
+                <div className="px-7 pt-5 pb-7">
+                  <div className="relative h-[300px] md:h-[360px] overflow-hidden rounded-2xl border border-line">
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="(min-width: 768px) 50vw, 100vw"
+                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                    />
+                  </div>
                 </div>
 
                 <div className="relative border-t border-line p-7">

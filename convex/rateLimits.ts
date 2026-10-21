@@ -41,6 +41,25 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
     period: MINUTE,
     capacity: 120,
   },
+  /**
+   * Every order sends an email to the address typed at checkout, from the
+   * store's own domain. Without a cap, a loop could use checkout to mail any
+   * inbox with text it wrote into the address fields. A real buyer places one
+   * order, occasionally two or three.
+   */
+  checkoutPerEmail: {
+    kind: "token bucket",
+    rate: 5,
+    period: 60 * MINUTE,
+    capacity: 5,
+  },
+  /** Everyone, everywhere. Far above a launch-day rush, well below a spray. */
+  checkoutGlobal: {
+    kind: "token bucket",
+    rate: 30,
+    period: MINUTE,
+    capacity: 30,
+  },
 });
 
 /** Shared by the sign-in path so the wording is identical wherever it surfaces. */

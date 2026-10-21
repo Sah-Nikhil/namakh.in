@@ -109,6 +109,7 @@ export default function AddressForm({
         label="Apartment, landmark (optional)"
         value={address.line2}
         onChange={(v) => onChange({ line2: v })}
+        error={errors.line2}
         autoComplete="address-line2"
         placeholder="Near…"
         className="sm:col-span-2"

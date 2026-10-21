@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { api } from "@/convex/_generated/api";
 import { convexServerClient, orderWriteSecret, readableConvexError } from "@/lib/convex-server";
 import { hasErrors, validateDraft } from "@/lib/commerce/validation";
 import type { CheckoutDraft } from "@/lib/commerce/types";
+import { orderReceivedEmail } from "@/lib/email/order-received";
+import { sendEmail } from "@/lib/email/send";
 import type { Id } from "@/convex/_generated/dataModel";
 
 type CheckoutRequest = {
@@ -73,6 +75,24 @@ export async function POST(request: Request) {
     // and let Razorpay's webhook call convex/orders.ts:recordPayment — which
     // already exists — rather than trusting the browser's success callback.
     // ---------------------------------------------------------------------
+
+    // Sent after the response, so a slow mail provider can't cost a saved order
+    // its 201 (the buyer would see an error and order again). On Vercel,
+    // after() keeps the function alive until the send finishes.
+    const origin = (process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin).replace(
+      /\/+$/,
+      "",
+    );
+    after(async () => {
+      try {
+        await sendEmail(
+          { to: order.email, ...orderReceivedEmail(order, origin) },
+          `order-received/${order.orderNumber}`,
+        );
+      } catch (error) {
+        console.error("Order email could not be built", error);
+      }
+    });
 
     return NextResponse.json(order, { status: 201 });
   } catch (error) {

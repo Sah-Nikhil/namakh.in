@@ -9,6 +9,7 @@ import { COMMERCE } from "../lib/commerce/config";
 import { computeTotals, codAvailable, shippingNeedsQuote } from "../lib/commerce/pricing";
 import { parcelFor } from "../lib/shiprocket/parcel";
 import { hasErrors, validateDraft } from "../lib/commerce/validation";
+import { rateLimiter } from "./rateLimits";
 
 /**
  * Order creation lives here, not in the Next.js route, so that prices are
@@ -32,6 +33,7 @@ const placedOrder = v.object({
   lines: v.array(orderLine),
   address: shippingAddress,
   email: v.string(),
+  paymentMethod: v.union(v.literal("razorpay"), v.literal("cod")),
   placedAt: v.number(),
 });
 
@@ -129,8 +131,19 @@ export const place = mutation({
     const errors = validateDraft(args.draft);
     if (hasErrors(errors)) throw new Error("Check the highlighted fields.");
 
+    // Each order emails the address it was placed with, so placement is capped
+    // per address and overall. A rejected order rolls the transaction back, so
+    // a failed attempt doesn't spend the buyer's allowance.
+    const tooMany = "Too many orders in a short time. Try again in a little while.";
+    const global = await rateLimiter.limit(ctx, "checkoutGlobal");
+    if (!global.ok) throw new Error(tooMany);
+    const perEmail = await rateLimiter.limit(ctx, "checkoutPerEmail", {
+      key: args.draft.email.trim().toLowerCase(),
+    });
+    if (!perEmail.ok) throw new Error(tooMany);
+
     const subtotal = lines.reduce((sum, l) => sum + l.price * l.qty, 0);
-    const method = args.draft.paymentMethod === "cod" ? "cod" : "razorpay";
+    const method: "razorpay" | "cod" = args.draft.paymentMethod === "cod" ? "cod" : "razorpay";
     if (method === "cod" && !codAvailable(subtotal)) {
       throw new Error("Cash on delivery is not available for this order.");
     }
@@ -213,6 +226,7 @@ export const place = mutation({
       lines,
       address: args.draft.address,
       email: args.draft.email.trim(),
+      paymentMethod: method,
       placedAt,
     };
   },

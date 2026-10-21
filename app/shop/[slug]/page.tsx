@@ -26,7 +26,7 @@ export default function ProductPage({
   }
 
   const galleryImages = [product.click, product.image, product.nutritionalLabel].filter(
-    Boolean
+    (src): src is string => Boolean(src)
   );
 
   const stats: [string, string][] = [
@@ -54,7 +54,7 @@ export default function ProductPage({
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14">
           {/* Gallery */}
-          <div className="lg:col-span-7 flex flex-col-reverse md:flex-row gap-4">
+          <div className="lg:col-span-7 flex flex-col-reverse md:flex-row md:items-start gap-4 lg:self-start lg:sticky lg:top-32">
             <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-visible scrollbar-hide md:w-24 shrink-0">
               {galleryImages.map((src, i) => (
                 <button
@@ -70,7 +70,8 @@ export default function ProductPage({
                     src={src}
                     alt={`View ${i + 1}`}
                     fill
-                    className="object-contain p-2"
+                    sizes="96px"
+                    className="object-cover"
                   />
                 </button>
               ))}
@@ -88,7 +89,8 @@ export default function ProductPage({
                   src={selectedImage}
                   alt={product.name}
                   fill
-                  className="object-contain p-10"
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="object-cover"
                   priority
                 />
               </motion.div>
@@ -161,14 +163,16 @@ export default function ProductPage({
                       : "daily balance"}
                     .
                   </p>
-                  <div className="relative mt-2 h-64 w-full overflow-hidden rounded-2xl border border-line bg-ink-2">
-                    <Image
-                      src={product.nutritionalLabel}
-                      alt="Nutrition label"
-                      fill
-                      className="object-contain p-4"
-                    />
-                  </div>
+                  {product.nutritionalLabel && (
+                    <div className="relative mt-2 h-64 w-full overflow-hidden rounded-2xl border border-line bg-ink-2">
+                      <Image
+                        src={product.nutritionalLabel}
+                        alt="Nutrition label"
+                        fill
+                        className="object-contain p-4"
+                      />
+                    </div>
+                  )}
                 </div>
               </details>
             </div>

@@ -29,6 +29,12 @@ export function validatePhone(value: string): string | undefined {
   return undefined;
 }
 
+/**
+ * Upper bounds on free-text fields. Generous for any real address, but they
+ * stop the order-received email from carrying a wall of someone else's text.
+ */
+const MAX_LENGTH = { fullName: 80, line1: 150, line2: 150, city: 60, state: 60 } as const;
+
 export function validateAddress(address: ShippingAddress): FieldErrors {
   const errors: FieldErrors = {};
 
@@ -46,6 +52,13 @@ export function validateAddress(address: ShippingAddress): FieldErrors {
 
   if (!address.city.trim()) errors.city = "City is required.";
   if (!address.state.trim()) errors.state = "State is required.";
+
+  for (const [field, max] of Object.entries(MAX_LENGTH)) {
+    const value = address[field as keyof typeof MAX_LENGTH] ?? "";
+    if (!errors[field] && value.trim().length > max) {
+      errors[field] = `Keep this under ${max} characters.`;
+    }
+  }
 
   return errors;
 }

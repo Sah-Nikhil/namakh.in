@@ -64,8 +64,9 @@ Shiprocket rejects webhook URLs containing "shiprocket", "kartrocket", "sr" or
 
 ## Consequences
 
-- **Pack sizes are placeholders.** `parcel` on each product in
-  `lib/products.ts` is estimated, not measured. Quotes and the parcel Shiprocket
+- **Box dimensions are placeholders.** Weights are the client's figures for
+  the whole filled container (Hydration 200 g, Sports 287 g, given 2026-10-20);
+  `parcel` dimensions in `lib/products.ts` are still estimated. Quotes and the parcel Shiprocket
   is told about are only as right as these numbers.
 - **Field names are partly unverified.** The serviceability response shape
   (`data.available_courier_companies[].rate` / `courier_company_id` /
@@ -88,3 +89,34 @@ Shiprocket rejects webhook URLs containing "shiprocket", "kartrocket", "sr" or
 4. Webhook configured with `/hooks/parcel-status` and the token.
 5. One real order watched end to end: quote → place → mark paid → appears in
    Shiprocket → book courier in panel → webhook updates the tracking page.
+
+## Status check, 2026-10-20
+
+- **Live quotes work.** The API user logs in, and quotes come back with
+  `source: "live"`.
+- **Only Blue Dart serves metro deliveries.** Chennai, Bangalore and Mumbai
+  return only Blue Dart Air (₹123–128, so ₹130 to the buyer). Shiprocket's own
+  rate calculator in the panel shows the same list, so this is the account,
+  not our code. It isn't the pickup PIN code either: Chennai → Bangalore also
+  shows only Blue Dart, while local Pondicherry deliveries get six couriers,
+  Delhivery and DTDC among them. Couriers aren't deactivated (Courier
+  Selection shows Delhivery and DTDC active), there are no Courier Rules,
+  stressed-courier blocking is on "Recommended" (never removes the last
+  option), and KYC is complete. The wallet is at ₹0 with no orders shipped.
+  This is a question for Shiprocket support.
+- **Blue Dart Advantage Surface is serviceable but inactive.** It quotes ₹92
+  for Chennai and Mumbai (6 days, against 2 for Blue Dart Air). Activating it
+  in Courier Selection would bring the buyer's price to ₹100. That is the
+  client's call.
+- **The webhook is set (dev deployment).** The panel's Webhooks page renders
+  only its heading: its form reads `data.url` from `getWebhookUrl`, which
+  returns `{"status":false,"data":[]}` for an account with no webhook, and the
+  page never recovers. The URL and token were saved through the same calls the
+  hidden form makes (`settings/webhook/storeUrl`, then `switch/true`) from the
+  logged-in panel session; the API user gets 403 on these. Shiprocket's test
+  ping reached `/hooks/parcel-status`, passed the `x-api-key` check and was
+  logged as an unknown order. The URL points at `steady-pony-163`; production
+  needs it changed to the production deployment's site URL.
+- **Blue Dart Advantage Surface needs paperwork.** Activating it opens a form
+  asking for a PAN card upload, company details and declarations (not a
+  reseller, no existing Blue Dart account). The client has to submit that.

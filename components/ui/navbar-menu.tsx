@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { motion } from "motion/react";
+import CartLauncher from "@/components/cart/cart-launcher";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -97,8 +98,7 @@ export const Menu = ({
             </div>
         </div>
         <div className="justify-end flex">
-          <MenuItem setActive={setActive} active={null} item="Your Cart">
-          </MenuItem>
+          <CartLauncher />
         </div>
         </nav>
     );

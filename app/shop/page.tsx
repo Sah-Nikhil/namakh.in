@@ -55,14 +55,16 @@ export default function ShopIndex() {
                 </span>
               </div>
 
-              <div className="relative flex h-[340px] md:h-[420px] items-center justify-center p-8">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  width={420}
-                  height={420}
-                  className="h-full w-auto object-contain drop-shadow-2xl transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-                />
+              <div className="px-7 pt-5 pb-7">
+                <div className="relative h-[340px] md:h-[420px] overflow-hidden rounded-2xl border border-line">
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                  />
+                </div>
               </div>
 
               <div className="relative border-t border-line p-7">

@@ -69,6 +69,7 @@ export type PlacedOrder = {
   lines: CartLine[];
   address: ShippingAddress;
   email: string;
+  paymentMethod: PaymentMethodId;
   placedAt: number;
 };
 

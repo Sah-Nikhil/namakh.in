@@ -11,7 +11,7 @@ import React, {
 import { COMMERCE } from "@/lib/commerce/config";
 import { computeTotals } from "@/lib/commerce/pricing";
 import type { CartLine, OrderTotals } from "@/lib/commerce/types";
-import type { Product } from "@/lib/products";
+import { getProductBySlug, type Product } from "@/lib/products";
 
 type CartContextValue = {
   lines: CartLine[];
@@ -47,7 +47,11 @@ function clampQty(qty: number): number {
   return Math.max(1, Math.min(COMMERCE.cart.maxQtyPerLine, Math.floor(qty)));
 }
 
-/** Storage can hold anything a previous build wrote. Only keep valid lines. */
+/**
+ * Storage can hold anything a previous build wrote. Only keep valid lines, and
+ * rebuild each one from the catalogue so a renamed image, name or price from
+ * an older build never shows in the cart. Products no longer stocked drop out.
+ */
 function parseStored(raw: string | null): CartLine[] {
   if (!raw) return [];
   try {
@@ -60,7 +64,10 @@ function parseStored(raw: string | null): CartLine[] {
         typeof (l as CartLine).slug === "string" &&
         typeof (l as CartLine).price === "number" &&
         Number.isFinite((l as CartLine).qty),
-    ).map((l) => ({ ...l, qty: clampQty(l.qty) }));
+    ).flatMap((l) => {
+      const product = getProductBySlug(l.slug);
+      return product ? [toLine(product, clampQty(l.qty))] : [];
+    });
   } catch {
     return [];
   }
