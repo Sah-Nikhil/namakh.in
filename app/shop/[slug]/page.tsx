@@ -27,9 +27,12 @@ export default function ProductPage({
     notFound();
   }
 
-  // The nutrition panel is a label crop, not a photo; it lives in the
-  // ingredients section rather than the gallery, where it would be cropped.
-  const galleryImages = [product.click, product.image];
+  // Photos fill their frame; the nutrition panel is a label crop, so it is
+  // shown whole on white instead of being cropped like a photo.
+  const galleryImages = [product.click, product.image, product.nutritionalLabel].filter(
+    (src): src is string => Boolean(src)
+  );
+  const isLabel = (src: string) => src === product.nutritionalLabel;
 
   const stats: [string, string][] = [
     ["Sodium", `${product.stats.sodium} mg`],
@@ -62,7 +65,10 @@ export default function ProductPage({
                 <button
                   key={i}
                   onClick={() => setSelectedImage(src)}
-                  className={`relative h-20 w-20 md:h-24 md:w-24 shrink-0 overflow-hidden rounded-xl border bg-ink-2 transition-all ${
+                  aria-label={isLabel(src) ? "Nutrition facts and ingredients" : `Photo ${i + 1}`}
+                  className={`relative h-20 w-20 md:h-24 md:w-24 shrink-0 overflow-hidden rounded-xl border transition-all ${
+                    isLabel(src) ? "bg-white" : "bg-ink-2"
+                  } ${
                     selectedImage === src
                       ? "border-bone/60 ring-1 ring-bone/20"
                       : "border-line hover:border-bone/30"
@@ -70,16 +76,20 @@ export default function ProductPage({
                 >
                   <Image
                     src={src}
-                    alt={`View ${i + 1}`}
+                    alt=""
                     fill
                     sizes="96px"
-                    className="object-cover"
+                    className={isLabel(src) ? "object-contain p-1" : "object-cover"}
                   />
                 </button>
               ))}
             </div>
 
-            <div className="relative flex flex-1 aspect-[4/5] md:aspect-square items-center justify-center overflow-hidden rounded-3xl border border-line bg-ink-2">
+            <div
+              className={`relative flex flex-1 aspect-[4/5] md:aspect-square items-center justify-center overflow-hidden rounded-3xl border border-line ${
+                isLabel(selectedImage) ? "bg-white" : "bg-ink-2"
+              }`}
+            >
               <motion.div
                 key={selectedImage}
                 initial={{ opacity: 0, scale: 0.96 }}
@@ -89,10 +99,14 @@ export default function ProductPage({
               >
                 <Image
                   src={selectedImage}
-                  alt={product.name}
+                  alt={
+                    isLabel(selectedImage)
+                      ? `${product.name} nutrition facts and ingredients, from the pack label`
+                      : product.name
+                  }
                   fill
                   sizes="(min-width: 1024px) 50vw, 100vw"
-                  className="object-cover"
+                  className={isLabel(selectedImage) ? "object-contain p-6" : "object-cover"}
                   priority
                 />
               </motion.div>
