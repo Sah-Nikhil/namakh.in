@@ -18,7 +18,9 @@ export default function CartLauncher() {
       type="button"
       onClick={openCart}
       aria-label={count > 0 ? `Open cart, ${count} ${count === 1 ? "item" : "items"}` : "Open cart"}
-      className="flex cursor-pointer items-center gap-2 text-black hover:opacity-[0.9]"
+      // Padding with matching negative margin gives the hover glow room
+      // without shifting the navbar layout. The glow is the salt accent, faint.
+      className="-mx-3 -my-1.5 flex cursor-pointer items-center gap-2 rounded-full px-3 py-1.5 text-black transition-[background-color,box-shadow] duration-300 hover:bg-white/70 hover:shadow-[0_0_18px_color-mix(in_oklab,var(--color-salt)_45%,transparent)] focus-visible:shadow-[0_0_18px_color-mix(in_oklab,var(--color-salt)_45%,transparent)] focus-visible:outline-none"
     >
       <IconShoppingCart className="h-4 w-4" />
       <span>Cart</span>
