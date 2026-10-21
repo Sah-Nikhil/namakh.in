@@ -114,3 +114,26 @@ export const INDIAN_STATES = [
   "Uttarakhand",
   "West Bengal",
 ] as const;
+
+/** Old or variant names India Post still returns, mapped to the list above. */
+const STATE_ALIASES: Record<string, (typeof INDIAN_STATES)[number]> = {
+  pondicherry: "Puducherry",
+  orissa: "Odisha",
+  uttaranchal: "Uttarakhand",
+  chattisgarh: "Chhattisgarh",
+  "dadra and nagar haveli": "Dadra and Nagar Haveli and Daman and Diu",
+  "daman and diu": "Dadra and Nagar Haveli and Daman and Diu",
+  "new delhi": "Delhi",
+  "nct of delhi": "Delhi",
+};
+
+/**
+ * A state name from the PIN code lookup, spelt the way the state dropdown
+ * spells it. Unknown names pass through unchanged, so a lookup never blanks
+ * the field.
+ */
+export function canonicalState(raw: string): string {
+  const key = raw.trim().replace(/\s*&\s*/g, " and ").replace(/\s+/g, " ").toLowerCase();
+  const exact = INDIAN_STATES.find((state) => state.toLowerCase() === key);
+  return exact ?? STATE_ALIASES[key] ?? raw.trim();
+}

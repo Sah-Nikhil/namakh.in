@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { COMMERCE } from "@/lib/commerce/config";
+import { canonicalState } from "@/lib/commerce/validation";
 import type { PincodeLookup } from "@/lib/commerce/types";
 
 /** Shape of the upstream india-post response, narrowed to what we use. */
@@ -55,6 +56,6 @@ export async function GET(
     pincode: code,
     serviceable: true,
     city: office.District,
-    state: office.State,
+    state: canonicalState(office.State),
   });
 }
