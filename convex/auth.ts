@@ -3,6 +3,7 @@ import { Email } from "@convex-dev/auth/providers/Email";
 import { ConvexError } from "convex/values";
 import { Resend } from "resend";
 import { isAdminEmail } from "./adminAllowlist";
+import { COMMERCE } from "../lib/commerce/config";
 import type { MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import { rateLimiter, retryMessage } from "./rateLimits";
@@ -75,6 +76,7 @@ const AdminEmailCode = Email({
     const { error } = await new Resend(apiKey).emails.send({
       from,
       to: email,
+      replyTo: COMMERCE.support.email,
       subject: `${token} is your Namakh order panel code`,
       text: `Your sign-in code is ${token}.\n\nIt expires in ${minutes} minutes. If you did not try to sign in, ignore this email.`,
       html: `<!doctype html><html><body style="margin:0;padding:24px;background:#f4f1ea;font-family:Arial,Helvetica,sans-serif;color:#111">

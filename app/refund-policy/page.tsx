@@ -138,11 +138,14 @@ export default function RefundPolicyPage() {
       </DocSection>
 
       <DocSection id="cancellations" title="Order Cancellations">
-        <p>Orders may be cancelled before they are dispatched.</p>
         <p>
-          Once an order has been shipped, it cannot be cancelled. However, you
-          may still be eligible for a return if your order qualifies under this
-          policy.
+          Orders cannot be cancelled once they have been placed and paid for.
+          Please check your items and delivery address before completing
+          payment.
+        </p>
+        <p>
+          If your order arrives damaged, incorrect, or incomplete, you are still
+          covered by the replacement and refund terms in this policy.
         </p>
       </DocSection>
 

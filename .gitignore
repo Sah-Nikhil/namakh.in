@@ -49,3 +49,7 @@ claude.md
 # served to the world, and invoices carry customer names and addresses.
 # The site uses images cut from the labels instead (public/assets/*_nutrition.png).
 public/**/*.pdf
+
+# Business documents for Razorpay (invoices, KYC) carry customer and owner
+# details. The repo is public; keep them local.
+docs/razorpay/

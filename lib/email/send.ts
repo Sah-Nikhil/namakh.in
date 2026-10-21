@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { COMMERCE } from "@/lib/commerce/config";
 
 /**
  * Sends one email through Resend. Never throws: an order is already saved by
@@ -20,11 +21,14 @@ export async function sendEmail(
     return false;
   }
 
+  // orders@namakh.in only sends; it has no mailbox. Replies go to support.
+  const replyTo = COMMERCE.support.email;
+
   try {
     // The SDK has no timeout of its own; a stalled connection would otherwise
     // hold the function open until the platform kills it.
     const { error } = await new Resend(apiKey).emails.send(
-      { from, ...message },
+      { from, replyTo, ...message },
       { idempotencyKey, signal: AbortSignal.timeout(8_000) },
     );
     if (error) {
