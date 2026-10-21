@@ -17,7 +17,7 @@ export default function CartLauncher() {
     <button
       type="button"
       onClick={openCart}
-      aria-label={count > 0 ? `Open cart, ${count} items` : "Open cart"}
+      aria-label={count > 0 ? `Open cart, ${count} ${count === 1 ? "item" : "items"}` : "Open cart"}
       className="flex cursor-pointer items-center gap-2 text-black hover:opacity-[0.9]"
     >
       <IconShoppingCart className="h-4 w-4" />

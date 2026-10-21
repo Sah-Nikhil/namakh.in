@@ -79,16 +79,14 @@ export default function ShippingPolicyPage() {
       </DocSection>
 
       <DocSection id="s2" index={2} title="Order Confirmation">
-        <p>After placing your order, you will receive:</p>
-        <ul>
-          <li>An Order Confirmation email.</li>
-          <li>
-            A Shipping Confirmation email once your order has been dispatched.
-          </li>
-        </ul>
         <p>
-          The Shipping Confirmation email will include your tracking details
-          whenever available.
+          After placing your order, you will receive an Order Confirmation
+          email with a link to track your order.
+        </p>
+        <p>
+          Once your order has been dispatched, tracking details appear on that
+          link and on our Track your order page, and our courier partner may
+          also send updates by email or SMS.
         </p>
         <p>
           If you do not receive an order confirmation within a reasonable time,
