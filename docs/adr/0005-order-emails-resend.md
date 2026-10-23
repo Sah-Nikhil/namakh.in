@@ -36,9 +36,14 @@ not single-use: the limits already stop the abuse, and single-use quotes would
 make a buyer who orders twice re-enter their PIN code.
 
 **4. The key can only send.**
-`RESEND_API_KEY` is a "Sending access" key named `namakh-site-production`. It
-covers all domains because Resend only offers domain-scoped keys for verified
-domains; narrow it to namakh.in once the domain verifies.
+`RESEND_API_KEY` is a "Sending access" key named `namakh-site-production`,
+restricted to the namakh.in domain (done 2026-10-21, after the domain verified).
+A send from any other domain is refused with 403.
+
+**5. Replies go to support.**
+orders@namakh.in has no mailbox, so every email sets `replyTo` to the support
+address in `COMMERCE.support` (`lib/email/send.ts`, and the admin code email in
+`convex/auth.ts`).
 
 ## Consequences
 
