@@ -50,10 +50,12 @@ export async function POST(request: Request) {
     });
     return NextResponse.json(status);
   } catch (error) {
+    const message = readableConvexError(error, "We could not reach the payment service. Try again.");
+    // A wrong order number or token is the caller's mistake, not an outage.
+    if (message === "We could not find that order.") {
+      return NextResponse.json({ error: "Order not found." }, { status: 404 });
+    }
     console.error(`Payment ${body.intent ?? "status"} failed for ${orderNumber}`, error);
-    return NextResponse.json(
-      { error: readableConvexError(error, "We could not reach the payment service. Try again.") },
-      { status: 502 },
-    );
+    return NextResponse.json({ error: message }, { status: 502 });
   }
 }

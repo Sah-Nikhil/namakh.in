@@ -48,13 +48,40 @@ though it is signed. `recordPayment` checks the paid amount equals the order
 total in paise, is safe to run repeatedly, and confirms only an order that is
 `awaiting_payment`.
 
-**5. One PhonePe order per attempt: `<orderNumber>-<n>`.**
-PhonePe refuses a reused `merchantOrderId`, so "Try again" opens attempt n+1,
-reserved in a mutation so two tabs can't collide. Before opening a new one,
-`startPayment` asks about the previous attempt and stops if it was paid. If
-two attempts are both paid anyway (the buyer paid, then retried while the
-first was still pending), the second is flagged on the order's timeline for a
-refund. Attempts are capped at 8 per order.
+**5. At most one open attempt per order, kept in a ledger.**
+*Revised 2026-11-23 after the independent review; the first version let
+"Try again" open a second payable attempt while the first was still pending.*
+Each PhonePe order we create is an attempt, `<orderNumber>-<n>`, with a row in
+`paymentAttempts`. `reserveAttempt` (a mutation, so concurrent clicks
+serialise) refuses to open a new attempt while another is `open`. "Try again"
+first asks PhonePe about the open attempt: paid → done; failed → a new attempt
+is allowed; still pending or unknown → the buyer is sent back to the same
+PhonePe page (its URL is stored), or told to wait if it can't be reused. A
+`/pay` call that times out leaves its attempt open rather than guessing.
+
+The cron works through open attempts by `nextCheckAt` (2 minutes, doubling,
+capped at 6 hours), whatever the order's status and however old, so a payment
+can't be lost to a missed webhook. An attempt PhonePe has never heard of five
+minutes after creation is closed as failed. If two attempts are ever both
+paid, the second is flagged on the order's timeline for a refund. Attempts are
+capped at 8 per order.
+
+A completed payment is checked before its attempt is closed. No amount in
+PhonePe's answer: the attempt stays open and is asked about again. An amount
+that doesn't match the order: the attempt goes to `review`, which blocks new
+attempts until a person settles it in the PhonePe dashboard.
+
+Attempts made before the ledger existed get their rows from
+`phonepe:backfillLedger` (run once per deployment, straight after the deploy
+that added it) and, as a guard, inside `reserveAttempt` itself.
+
+**5a. Checkout and payment are two requests.**
+`/api/checkout` saves the order and returns it; the browser stores the
+tracking token, then asks `/api/payment` to open the payment. A slow PhonePe
+therefore can't cost the buyer the saved order. All PhonePe calls have a
+10-second deadline. The `PAYMENTS_LIVE` switch is enforced inside
+`startPayment` too, and payment rate limits are spent only after the order
+number and tracking token check out (per order first, then overall).
 
 **6. The "order confirmed" email moves to Convex for prepaid orders.**
 A prepaid order is emailed only once PhonePe confirms it

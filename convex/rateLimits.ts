@@ -61,14 +61,23 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
   },
   /**
    * Calls that reach PhonePe from the storefront (starting a payment,
-   * checking one from the confirmation page). Each needs the order's tracking
-   * token already; this only keeps a loop from hammering PhonePe's API.
+   * checking one from the confirmation page). Only spent after the order
+   * number and tracking token have been checked, so made-up requests cost
+   * nothing here. Per order first: one buyer's polling tab (a check every
+   * 3 seconds for 30 seconds) fits comfortably, a loop on one order does not.
    */
+  paymentPerOrder: {
+    kind: "token bucket",
+    rate: 30,
+    period: MINUTE,
+    capacity: 30,
+  },
+  /** Every order together. Well above a busy day, well below PhonePe's limits. */
   paymentCalls: {
     kind: "token bucket",
-    rate: 120,
+    rate: 600,
     period: MINUTE,
-    capacity: 120,
+    capacity: 600,
   },
   /**
    * Footer newsletter sign-ups. Nothing is emailed on sign-up, so the risk is

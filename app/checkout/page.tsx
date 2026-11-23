@@ -161,9 +161,6 @@ export default function CheckoutPage() {
       const payload = (await response.json()) as PlacedOrder & {
         error?: string;
         errors?: FieldErrors;
-        /** PhonePe's payment page, for a prepaid order. */
-        payUrl?: string;
-        payError?: string;
       };
 
       if (!response.ok) {
@@ -179,18 +176,36 @@ export default function CheckoutPage() {
       // The order is saved in Convex now. This copy carries the tracking token
       // to the confirmation page, including across the trip to PhonePe and
       // back (same tab, so sessionStorage survives). It is not the record.
-      const { payUrl, payError, ...placed } = payload;
-      void payError; // the confirmation page offers "Pay now" when payUrl is missing
-      window.sessionStorage.setItem(LAST_ORDER_KEY, JSON.stringify(placed));
+      window.sessionStorage.setItem(LAST_ORDER_KEY, JSON.stringify(payload));
       clear();
       clearDraft();
-      if (payUrl) {
-        // Keep the button spinning: the page is about to unload.
-        leaving = true;
-        window.location.assign(payUrl);
-        return;
+
+      const successPath = `/checkout/success?order=${encodeURIComponent(payload.orderNumber)}`;
+      if (PAYMENTS_LIVE && payload.paymentMethod !== "cod") {
+        // Second step: open the PhonePe payment. Any failure lands on the
+        // confirmation page, which shows the order and a "Pay" button.
+        try {
+          const pay = await fetch("/api/payment", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              orderNumber: payload.orderNumber,
+              token: payload.trackToken,
+              intent: "pay",
+            }),
+          });
+          const started = (await pay.json()) as { kind?: string; url?: string };
+          if (pay.ok && started.kind === "redirect" && started.url) {
+            // Keep the button spinning: the page is about to unload.
+            leaving = true;
+            window.location.assign(started.url);
+            return;
+          }
+        } catch {
+          // fall through to the confirmation page
+        }
       }
-      router.push(`/checkout/success?order=${encodeURIComponent(payload.orderNumber)}`);
+      router.push(successPath);
     } catch {
       setFormError("Network problem. Check your connection and try again.");
     } finally {

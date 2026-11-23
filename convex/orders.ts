@@ -390,8 +390,10 @@ export const recordStatus = internalMutation({
  * Called only from convex/phonepe.ts, after asking PhonePe directly; a
  * webhook body or a browser redirect is never enough on its own.
  *
- * Safe to run any number of times for the same attempt: webhooks repeat,
- * and the success page, the webhook and the cron can all race.
+ * Settles the attempt's row in `paymentAttempts`, then the order. Safe to run
+ * any number of times for the same attempt: webhooks repeat, and the success
+ * page, the webhook and the cron can all race. Attempts that predate the
+ * ledger (no row) are still matched to their order by the id's prefix.
  */
 export const recordPayment = internalMutation({
   args: {
@@ -403,55 +405,95 @@ export const recordPayment = internalMutation({
     transactionId: v.optional(v.string()),
     paymentMode: v.optional(v.string()),
   },
-  returns: v.null(),
+  /**
+   * settled: the attempt reached a final state. unresolved: the answer was
+   * incomplete (no amount), so ask again later. review: a completed payment
+   * that doesn't match the order. ignored: no such order.
+   */
+  returns: v.union(
+    v.literal("settled"),
+    v.literal("unresolved"),
+    v.literal("review"),
+    v.literal("ignored"),
+  ),
   handler: async (ctx, args) => {
-    const cut = args.merchantOrderId.lastIndexOf("-");
-    const orderNumber = args.merchantOrderId.slice(0, cut);
-    const attempt = Number(args.merchantOrderId.slice(cut + 1));
-
-    const order = await ctx.db
-      .query("orders")
-      .withIndex("by_orderNumber", (q) => q.eq("orderNumber", orderNumber))
+    const row = await ctx.db
+      .query("paymentAttempts")
+      .withIndex("by_merchantOrderId", (q) => q.eq("merchantOrderId", args.merchantOrderId))
       .unique();
-    if (!order || !Number.isInteger(attempt) || attempt < 1 || attempt > (order.paymentAttempts ?? 0)) {
+
+    const cut = args.merchantOrderId.lastIndexOf("-");
+    const order = row
+      ? await ctx.db.get("orders", row.orderId)
+      : await ctx.db
+          .query("orders")
+          .withIndex("by_orderNumber", (q) => q.eq("orderNumber", args.merchantOrderId.slice(0, cut)))
+          .unique();
+    if (!order) {
       console.warn(`PhonePe status for unknown attempt ${args.merchantOrderId}.`);
-      return null;
+      return "ignored" as const;
     }
+
+    const now = Date.now();
+    const settleRow = async (state: "completed" | "failed" | "review") => {
+      if (row && row.state === "open") {
+        await ctx.db.patch("paymentAttempts", row._id, {
+          state,
+          ...(state === "review" ? {} : { resolvedAt: now }),
+          ...(args.phonepeOrderId ? { phonepeOrderId: args.phonepeOrderId } : {}),
+        });
+      }
+    };
 
     if (args.state === "FAILED") {
-      // Only the latest attempt speaks for the order; an old one failing
-      // (expired, abandoned) says nothing about the retry that followed.
-      if (
-        order.paymentStatus === "pending" &&
-        order.phonepeMerchantOrderId === args.merchantOrderId
-      ) {
+      await settleRow("failed");
+      // The order is "failed" only once nothing else could still pay it.
+      if (order.paymentStatus === "pending" && !(await hasOpenAttempt(ctx, order._id))) {
         await ctx.db.patch("orders", order._id, { paymentStatus: "failed" });
       }
-      return null;
+      return "settled" as const;
     }
 
-    // COMPLETED. The amount is checked against the order, so a payment for
-    // the wrong total can never confirm it.
+    // COMPLETED. Validated before the attempt is closed, so an incomplete or
+    // wrong answer never removes the guard against a second payment.
+    if (args.amountPaise === undefined) {
+      return "unresolved" as const; // ask PhonePe again later
+    }
     const expected = Math.round(order.totals.total * 100);
     if (args.amountPaise !== expected) {
       console.error(
-        `PhonePe ${args.merchantOrderId} paid ${args.amountPaise} paise, order ${orderNumber} expects ${expected}. Not confirmed; check it in the PhonePe dashboard.`,
+        `PhonePe ${args.merchantOrderId} paid ${args.amountPaise} paise, order ${order.orderNumber} expects ${expected}. Not confirmed; settle it in the PhonePe dashboard.`,
       );
-      return null;
+      if (row?.state === "open") {
+        await settleRow("review");
+        await appendEvent(
+          ctx,
+          order._id,
+          order.status,
+          "Payment received, being checked",
+          "system",
+          `PhonePe ${args.transactionId ?? args.merchantOrderId}: ${args.amountPaise} paise, expected ${expected}`,
+        );
+      }
+      return "review" as const;
     }
+    await settleRow("completed");
 
     const reference = args.transactionId ? `PhonePe ${args.transactionId}` : `PhonePe ${args.merchantOrderId}`;
 
     if (order.paymentStatus === "paid") {
-      // A second attempt also went through: the buyer has paid twice. Flag it
-      // once on the order so someone refunds it from the PhonePe dashboard.
-      if (args.transactionId && args.transactionId !== order.phonepeTransactionId) {
+      // Another attempt already paid: the buyer has paid twice. Flag it once
+      // on the order so someone refunds it from the PhonePe dashboard.
+      const sameAsRecorded =
+        args.merchantOrderId === order.phonepeMerchantOrderId &&
+        (!args.transactionId || args.transactionId === order.phonepeTransactionId);
+      if (!sameAsRecorded) {
         const events = await ctx.db
           .query("orderEvents")
           .withIndex("by_orderId", (q) => q.eq("orderId", order._id))
           .take(100);
         if (!events.some((e) => e.detail === reference)) {
-          console.error(`Order ${orderNumber} was paid twice; refund ${reference}.`);
+          console.error(`Order ${order.orderNumber} was paid twice; refund ${reference}.`);
           await appendEvent(
             ctx,
             order._id,
@@ -462,7 +504,7 @@ export const recordPayment = internalMutation({
           );
         }
       }
-      return null;
+      return "settled" as const;
     }
 
     // Payment advances only an order that was waiting for it. An order
@@ -475,7 +517,7 @@ export const recordPayment = internalMutation({
       phonepeOrderId: args.phonepeOrderId,
       phonepeTransactionId: args.transactionId,
       paymentMode: args.paymentMode,
-      paidAt: Date.now(),
+      paidAt: now,
     });
     await appendEvent(
       ctx,
@@ -490,6 +532,15 @@ export const recordPayment = internalMutation({
       await queueShiprocketPush(ctx, order);
       await ctx.scheduler.runAfter(0, internal.emails.orderConfirmed, { orderId: order._id });
     }
-    return null;
+    return "settled" as const;
   },
 });
+
+/** True while any PhonePe attempt for the order could still take money. */
+export async function hasOpenAttempt(ctx: MutationCtx, orderId: Id<"orders">): Promise<boolean> {
+  const attempts = await ctx.db
+    .query("paymentAttempts")
+    .withIndex("by_orderId", (q) => q.eq("orderId", orderId))
+    .take(20);
+  return attempts.some((a) => a.state === "open" || a.state === "review");
+}

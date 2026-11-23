@@ -28,21 +28,26 @@ import type { PlacedOrder } from "@/lib/commerce/types";
  *  paid     — confirmed.
  *  waiting  — PhonePe has not settled it yet (UPI can take a few seconds).
  *  unpaid   — no payment, a failed one, or one never started.
+ *  closed   — the order was cancelled (or returned); nothing more to pay.
  *  error    — we could not reach PhonePe.
  */
-type Phase = "offline" | "checking" | "paid" | "waiting" | "unpaid" | "error";
+type Phase = "offline" | "checking" | "paid" | "waiting" | "unpaid" | "closed" | "error";
 
 /** Re-ask every few seconds while PhonePe says pending, then offer a retry. */
 const POLL_MS = 3000;
 const POLLS_BEFORE_RETRY = 10;
 
 type StatusResult = {
+  status?: string;
   paymentStatus?: string;
   gateway?: "NONE" | "PENDING" | "COMPLETED" | "FAILED" | "UNKNOWN";
   error?: string;
 };
 
-type PayResult = { kind?: "redirect" | "paid" | "closed"; url?: string; error?: string };
+type PayResult = { kind?: "redirect" | "paid" | "closed" | "wait"; url?: string; error?: string };
+
+/** Orders that can no longer be paid for or shipped. */
+const CLOSED = new Set(["cancelled", "returned"]);
 
 async function paymentRequest<T>(order: PlacedOrder, intent: "status" | "pay"): Promise<T> {
   const response = await fetch("/api/payment", {
@@ -55,7 +60,9 @@ async function paymentRequest<T>(order: PlacedOrder, intent: "status" | "pay"): 
   return result;
 }
 
-function headline(phase: Phase, stuck: boolean, order: PlacedOrder) {
+type Closed = { as: "cancelled" | "returned"; paymentOpen: boolean };
+
+function headline(phase: Phase, stuck: boolean, order: PlacedOrder, paid: boolean, closed: Closed) {
   const firstName = order.address.fullName ? `, ${order.address.fullName.split(" ")[0]}` : "";
   switch (phase) {
     case "paid":
@@ -84,6 +91,23 @@ function headline(phase: Phase, stuck: boolean, order: PlacedOrder) {
         title: "Your order is saved, but not paid.",
         body: "Nothing has been charged. Pay now to confirm it; we only ship paid orders.",
       };
+    case "closed":
+      if (closed.as === "returned") {
+        return {
+          kicker: "Order returned",
+          title: "This order was returned.",
+          body: "Questions about it, or about your refund? Write to us and we'll help.",
+        };
+      }
+      return {
+        kicker: "Order closed",
+        title: "This order was cancelled.",
+        body: paid
+          ? "It won't be shipped, and your payment for it will be refunded. Write to us if you have questions."
+          : closed.paymentOpen
+            ? "It won't be shipped. PhonePe is still processing a payment for it; if that goes through, it will be refunded. Write to us if money has left your account."
+            : "It won't be shipped, and nothing has been charged.",
+      };
     case "error":
       return {
         kicker: "Order saved",
@@ -110,6 +134,8 @@ export default function CheckoutSuccessPage() {
   const [stuck, setStuck] = useState(false);
   const [paying, setPaying] = useState(false);
   const [payProblem, setPayProblem] = useState<string | null>(null);
+  const [paid, setPaid] = useState(false);
+  const [closed, setClosed] = useState<Closed>({ as: "cancelled", paymentOpen: false });
   const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const checkPayment = useCallback(async (placed: PlacedOrder, round: number) => {
@@ -119,6 +145,19 @@ export default function CheckoutSuccessPage() {
     }
     try {
       const result = await paymentRequest<StatusResult>(placed, "status");
+      const paidNow = result.paymentStatus === "paid";
+      setPaid(paidNow);
+      if (result.status && CLOSED.has(result.status)) {
+        // Closed for shipping, but a payment may still be settling: say so,
+        // and keep checking for a while rather than claiming nothing was charged.
+        const paymentOpen = !paidNow && (result.gateway === "PENDING" || result.gateway === "UNKNOWN");
+        setClosed({ as: result.status === "returned" ? "returned" : "cancelled", paymentOpen });
+        setPhase("closed");
+        if (paymentOpen && round + 1 < POLLS_BEFORE_RETRY) {
+          pollRef.current = setTimeout(() => void checkPayment(placed, round + 1), POLL_MS);
+        }
+        return;
+      }
       if (result.paymentStatus === "paid") return setPhase("paid");
       if (result.gateway === "NONE" || result.gateway === "FAILED") return setPhase("unpaid");
 
@@ -163,6 +202,16 @@ export default function CheckoutSuccessPage() {
         window.location.assign(result.url);
         return; // leave the spinner on while the page unloads
       }
+      if (result.kind === "wait") {
+        // An earlier payment is still open with PhonePe and its page can't
+        // be reused; it settles on its own. Keep checking meanwhile.
+        setPayProblem(
+          "PhonePe still has a payment open for this order. Give it a few minutes; if it went through, this page will update.",
+        );
+        setPaying(false);
+        await checkPayment(order, 0);
+        return;
+      }
       // Paid after all, or no longer payable: show what the order says now.
       await checkPayment(order, 0);
     } catch (error) {
@@ -177,7 +226,7 @@ export default function CheckoutSuccessPage() {
 
   const trackPath = order ? trackingPath(order.orderNumber, order.trackToken) : "";
   const confirmed = phase === "paid" || (phase === "offline" && order?.paymentMethod === "cod");
-  const copy = order ? headline(phase, stuck, order) : null;
+  const copy = order ? headline(phase, stuck, order, paid, closed) : null;
 
   const copyTrackingLink = async () => {
     try {
@@ -296,13 +345,19 @@ export default function CheckoutSuccessPage() {
                 <div className="bg-ink p-5">
                   <dt className="text-xs text-bone-faint">Status</dt>
                   <dd className="mt-1 font-mono-jb text-sm text-bone">
-                    {confirmed ? "Confirmed" : "Awaiting payment"}
+                    {phase === "closed"
+                      ? closed.as === "returned"
+                        ? "Returned"
+                        : "Cancelled"
+                      : confirmed
+                        ? "Confirmed"
+                        : "Awaiting payment"}
                   </dd>
                 </div>
                 <div className="bg-ink p-5">
                   <dt className="text-xs text-bone-faint">Estimated delivery</dt>
                   <dd className="mt-1 font-mono-jb text-sm text-bone">
-                    <DeliveryWindow />
+                    {phase === "closed" ? "—" : <DeliveryWindow />}
                   </dd>
                 </div>
               </dl>

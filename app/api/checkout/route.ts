@@ -7,7 +7,7 @@ import { orderReceivedEmail } from "@/lib/email/order-received";
 import { sendEmail } from "@/lib/email/send";
 import type { Id } from "@/convex/_generated/dataModel";
 import { PAYMENTS_LIVE } from "@/lib/commerce/config";
-import { paymentReturnUrl, siteOrigin } from "@/lib/site-origin";
+import { siteOrigin } from "@/lib/site-origin";
 
 type CheckoutRequest = {
   items: { slug: string; qty: number }[];
@@ -24,8 +24,8 @@ type CheckoutRequest = {
  * early so the buyer gets per-field errors instead of one generic failure, and
  * holds the write secret so the browser never sees it.
  *
- * For a prepaid order it then opens the PhonePe payment and returns `payUrl`,
- * PhonePe's payment page, for the browser to go to (ADR 0007).
+ * A prepaid order is paid in a second step: the browser calls /api/payment
+ * with the returned tracking token (ADR 0007).
  */
 export async function POST(request: Request) {
   let body: CheckoutRequest;
@@ -86,24 +86,11 @@ export async function POST(request: Request) {
       return NextResponse.json(order, { status: 201 });
     }
 
-    // Open the PhonePe payment. If that fails the order is still saved, and
-    // the confirmation page offers "Pay now" to try again.
-    let payUrl: string | undefined;
-    let payError: string | undefined;
-    try {
-      const started = await convexServerClient().action(api.phonepe.startPayment, {
-        secret: orderWriteSecret(),
-        orderNumber: order.orderNumber,
-        trackToken: order.trackToken,
-        returnUrl: paymentReturnUrl(origin, order.orderNumber),
-      });
-      if (started.kind === "redirect") payUrl = started.url;
-    } catch (error) {
-      console.error(`Payment could not be started for ${order.orderNumber}`, error);
-      payError = readableConvexError(error, "We saved your order but could not open the payment page.");
-    }
-
-    return NextResponse.json({ ...order, payUrl, payError }, { status: 201 });
+    // Prepaid: the browser saves this order (with its tracking token) and
+    // then asks /api/payment to open the PhonePe payment. Doing that as a
+    // second step means a slow or failing PhonePe can never cost the buyer
+    // the saved order's response.
+    return NextResponse.json(order, { status: 201 });
   } catch (error) {
     console.error("Order placement failed", error);
     return NextResponse.json({ error: readableConvexError(error) }, { status: 502 });

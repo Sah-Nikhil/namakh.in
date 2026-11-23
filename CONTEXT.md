@@ -211,9 +211,11 @@ someone quotes to support. It is **semi-guessable and is not a credential**; see
 
 ### Payment attempt
 One try at paying an order: a PhonePe order with the id
-`<orderNumber>-<n>` (the **merchant order id**). PhonePe refuses a reused id,
-so "Try again" is attempt n+1. The order keeps the latest attempt's ids, or
-the paid one's. At most 8 per order.
+`<orderNumber>-<n>` (the **merchant order id**), recorded in the
+`paymentAttempts` table. An attempt is **open** until PhonePe says it
+completed or failed; an order has at most one open attempt, and "Try again"
+reuses it. A new attempt (n+1) is only made after the open one failed. The
+order keeps the latest attempt's ids, or the paid one's. At most 8 per order.
 *Avoid* transaction (that is PhonePe's id for the money movement inside an
 attempt, `phonepeTransactionId`), payment id.
 

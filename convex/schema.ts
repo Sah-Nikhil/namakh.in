@@ -162,6 +162,45 @@ export default defineSchema({
     expiresAt: v.number(),
   }).index("by_expiresAt", ["expiresAt"]),
 
+  /**
+   * Every PhonePe payment attempt, one row per merchant order id sent to
+   * PhonePe (ADR 0007). The ledger is what makes payments safe to retry:
+   * an order may have at most one "open" attempt, and the reconcile cron
+   * keeps asking PhonePe about each open one until it settles, however old,
+   * so a payment is never lost to a missed webhook.
+   */
+  paymentAttempts: defineTable({
+    orderId: v.id("orders"),
+    /** `<orderNumber>-<attempt>`. */
+    merchantOrderId: v.string(),
+    attempt: v.number(),
+    /**
+     * open: could still take money. review: PhonePe reported a payment that
+     * doesn't match the order (wrong amount); blocks new attempts until a
+     * person settles it in the PhonePe dashboard. completed / failed: final.
+     */
+    state: v.union(
+      v.literal("open"),
+      v.literal("review"),
+      v.literal("completed"),
+      v.literal("failed"),
+    ),
+    amountPaise: v.number(),
+    /** PhonePe's payment page for this attempt; reused while it is open. */
+    payUrl: v.optional(v.string()),
+    phonepeOrderId: v.optional(v.string()),
+    createdAt: v.number(),
+    /** When PhonePe stops accepting payment on this attempt. */
+    expiresAt: v.number(),
+    /** Next background status check. Only meaningful while open. */
+    nextCheckAt: v.number(),
+    checks: v.number(),
+    resolvedAt: v.optional(v.number()),
+  })
+    .index("by_merchantOrderId", ["merchantOrderId"])
+    .index("by_orderId", ["orderId"])
+    .index("by_state_and_nextCheckAt", ["state", "nextCheckAt"]),
+
   /** Cached API logins. Shiprocket tokens last about ten days, PhonePe's minutes to hours. */
   integrationTokens: defineTable({
     provider: v.union(v.literal("shiprocket"), v.literal("phonepe")),
