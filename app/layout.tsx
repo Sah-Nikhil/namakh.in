@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   title: "Namakh — Electrolytes, done right.",
   description:
     "Precision-formulated electrolytes. No nonsense. Two blends, engineered for how you actually live and train.",
-  // Kept out of search until Razorpay approves the store. See lib/site.ts.
+  // Indexable since launch; flip SEARCH_INDEXING to hide the site again. See lib/site.ts.
   robots: SEARCH_INDEXING ? undefined : { index: false, follow: false },
 };
 

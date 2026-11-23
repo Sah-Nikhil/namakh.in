@@ -26,7 +26,9 @@ export type AdminOrder = {
   totals: OrderTotals;
   status: OrderStatus;
   paymentStatus: "pending" | "paid" | "cod_pending" | "failed" | "refunded";
-  paymentMethod: "razorpay" | "cod";
+  paymentMethod: "phonepe" | "cod" | "razorpay";
+  phonepeTransactionId?: string;
+  paymentMode?: string;
   courier?: string;
   awb?: string;
   trackingUrl?: string;
@@ -226,6 +228,15 @@ export default function OrderRow({ order }: { order: AdminOrder }) {
                     {order.paymentStatus.replace(/_/g, " ")}
                   </dd>
                 </div>
+                {order.phonepeTransactionId && (
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-bone-faint">PhonePe ref.</dt>
+                    <dd className="font-mono-jb text-xs text-bone-dim">
+                      {order.phonepeTransactionId}
+                      {order.paymentMode ? ` · ${order.paymentMode.replace(/_/g, " ")}` : ""}
+                    </dd>
+                  </div>
+                )}
               </dl>
               {order.awb && (
                 <p className="mt-4 text-xs text-bone-faint">

@@ -29,9 +29,12 @@ export function orderWriteSecret(): string {
  * `[CONVEX M(orders:place)] [Request ID: ...] Server Error\nUncaught Error: Your cart is empty.`
  * Buyers should see the sentence we wrote, not the frame around it.
  */
-export function readableConvexError(error: unknown): string {
+export function readableConvexError(
+  error: unknown,
+  fallback = "We could not place that order. Try again.",
+): string {
   const raw = error instanceof Error ? error.message : String(error);
   const match = raw.match(/Uncaught Error:\s*([^\n]+)/);
   if (match) return match[1].trim();
-  return "We could not place that order. Try again.";
+  return fallback;
 }

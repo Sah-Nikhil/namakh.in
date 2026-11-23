@@ -38,7 +38,7 @@ export function shiprocketRow(order: {
   address: ShippingAddress;
   lines: CartLine[];
   totals: OrderTotals;
-  paymentMethod: "razorpay" | "cod";
+  paymentMethod: "phonepe" | "cod" | "razorpay";
 }): string {
   const date = new Date(order.placedAt).toISOString().slice(0, 10);
   const names = order.lines.map((l) => l.name).join(" + ");

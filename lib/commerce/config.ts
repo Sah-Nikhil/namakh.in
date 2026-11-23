@@ -132,20 +132,23 @@ export const COMMERCE = {
   country: "India",
 };
 
-/** Payment rails the checkout knows about. */
-export type PaymentMethodId = "razorpay" | "cod";
+/** Payment rails the checkout knows about. PhonePe replaced Razorpay (ADR 0007). */
+export type PaymentMethodId = "phonepe" | "cod";
 
 /**
- * Razorpay is not live yet — the merchant account is pending approval, and
- * approval requires this very flow to be submitted for review. Until then the
- * checkout collects everything and records the order as awaiting payment.
- * Flip this to true once keys land in .env.local; see app/api/checkout/route.ts.
+ * Online payment through PhonePe Standard Checkout (ADR 0007). On: placing a
+ * prepaid order sends the buyer to PhonePe's payment page, and the order is
+ * confirmed only once PhonePe's status API says it was paid. Off: orders are
+ * saved as awaiting payment and nobody is charged, as before PhonePe.
+ *
+ * Whether the payments are real or sandbox is decided on the Convex
+ * deployment (PHONEPE_ENV and the keys there), not here.
  */
-export const PAYMENTS_LIVE = false;
+export const PAYMENTS_LIVE = true;
 
 /**
  * Where the just-placed order is parked for the confirmation page to read.
- * sessionStorage, because there is no order database yet — see the note in
- * app/api/checkout/route.ts.
+ * The order itself lives in Convex; this copy carries the tracking token
+ * across the trip to PhonePe and back, in the same tab.
  */
 export const LAST_ORDER_KEY = "namakh.order.last";

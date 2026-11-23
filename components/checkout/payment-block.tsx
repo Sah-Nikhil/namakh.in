@@ -4,7 +4,7 @@ import { IconCash, IconLock, IconShieldCheck } from "@tabler/icons-react";
 import { COMMERCE, PAYMENTS_LIVE, type PaymentMethodId } from "@/lib/commerce/config";
 import { codAvailable, formatINR } from "@/lib/commerce/pricing";
 
-const RAILS = ["UPI", "Cards", "Net banking", "Wallets"];
+const RAILS = ["UPI", "Cards", "Net banking"];
 
 function Option({
   active,
@@ -62,9 +62,11 @@ export default function PaymentBlock({
   return (
     <div className="space-y-3">
       <Option
-        active={method === "razorpay"}
-        onSelect={() => onChange("razorpay")}
-        title="Pay securely with Razorpay"
+        // Anything but COD is online: a draft saved before the switch from
+        // Razorpay still says "razorpay" and should land here.
+        active={method !== "cod"}
+        onSelect={() => onChange("phonepe")}
+        title="Pay online with PhonePe"
         meta={
           <span className="hidden gap-1.5 sm:flex">
             {RAILS.map((rail) => (
@@ -82,13 +84,14 @@ export default function PaymentBlock({
           <IconLock className="mt-0.5 h-4 w-4 shrink-0" />
           {PAYMENTS_LIVE ? (
             <span>
-              You will complete the payment in Razorpay&rsquo;s secure window. Namakh never sees or
-              stores your card or UPI details.
+              Placing the order takes you to PhonePe&rsquo;s secure payment page, then back here.
+              Pay by UPI, card or net banking. Namakh never sees or stores your card or UPI
+              details.
             </span>
           ) : (
             <span>
-              Payments are processed securely by Razorpay. Namakh never sees or stores your
-              card or UPI details.
+              Payments are processed securely by PhonePe. Namakh never sees or stores your card
+              or UPI details.
             </span>
           )}
         </p>

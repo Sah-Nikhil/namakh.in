@@ -30,7 +30,7 @@ import {
   validateEmail,
   type FieldErrors,
 } from "@/lib/commerce/validation";
-import { COMMERCE, LAST_ORDER_KEY } from "@/lib/commerce/config";
+import { COMMERCE, LAST_ORDER_KEY, PAYMENTS_LIVE } from "@/lib/commerce/config";
 import type { PlacedOrder } from "@/lib/commerce/types";
 import { useIsDesktop } from "@/lib/use-media-query";
 
@@ -146,6 +146,7 @@ export default function CheckoutPage() {
       address: { ...draft.address, phone: normalisePhone(draft.address.phone) },
     };
 
+    let leaving = false;
     try {
       const response = await fetch("/api/checkout", {
         method: "POST",
@@ -160,6 +161,9 @@ export default function CheckoutPage() {
       const payload = (await response.json()) as PlacedOrder & {
         error?: string;
         errors?: FieldErrors;
+        /** PhonePe's payment page, for a prepaid order. */
+        payUrl?: string;
+        payError?: string;
       };
 
       if (!response.ok) {
@@ -172,16 +176,25 @@ export default function CheckoutPage() {
       }
 
       placedRef.current = true;
-      // The order is saved in Convex now. This copy only saves the confirmation
-      // page a round trip; it is not the record of the order.
-      window.sessionStorage.setItem(LAST_ORDER_KEY, JSON.stringify(payload));
+      // The order is saved in Convex now. This copy carries the tracking token
+      // to the confirmation page, including across the trip to PhonePe and
+      // back (same tab, so sessionStorage survives). It is not the record.
+      const { payUrl, payError, ...placed } = payload;
+      void payError; // the confirmation page offers "Pay now" when payUrl is missing
+      window.sessionStorage.setItem(LAST_ORDER_KEY, JSON.stringify(placed));
       clear();
       clearDraft();
+      if (payUrl) {
+        // Keep the button spinning: the page is about to unload.
+        leaving = true;
+        window.location.assign(payUrl);
+        return;
+      }
       router.push(`/checkout/success?order=${encodeURIComponent(payload.orderNumber)}`);
     } catch {
       setFormError("Network problem. Check your connection and try again.");
     } finally {
-      setSubmitting(false);
+      if (!leaving) setSubmitting(false);
     }
   };
 
@@ -322,7 +335,9 @@ export default function CheckoutPage() {
         <>Add your PIN code to see the total</>
       ) : (
         <>
-          <IconLock className="h-4 w-4" /> Place order &middot; {formatINR(totals.total)}
+          <IconLock className="h-4 w-4" />{" "}
+          {PAYMENTS_LIVE && draft.paymentMethod !== "cod" ? "Pay" : "Place order"} &middot;{" "}
+          {formatINR(totals.total)}
         </>
       )}
     </button>

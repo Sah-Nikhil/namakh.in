@@ -136,7 +136,7 @@ export default function PrivacyPolicyPage() {
       <DocSection id="s4" index={4} title="Payment Security">
         <p>
           Payments made on Namakh are securely processed through trusted
-          third-party payment providers, including Razorpay.
+          third-party payment providers, including PhonePe.
         </p>
         <p>Namakh does not store or have access to your:</p>
         <ul>

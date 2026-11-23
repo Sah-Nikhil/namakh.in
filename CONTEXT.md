@@ -209,6 +209,14 @@ someone quotes to support. It is **semi-guessable and is not a credential**; see
 "Track token" below.
 *Avoid* order id (that is the Convex `_id`), reference number.
 
+### Payment attempt
+One try at paying an order: a PhonePe order with the id
+`<orderNumber>-<n>` (the **merchant order id**). PhonePe refuses a reused id,
+so "Try again" is attempt n+1. The order keeps the latest attempt's ids, or
+the paid one's. At most 8 per order.
+*Avoid* transaction (that is PhonePe's id for the money movement inside an
+attempt, `phonepeTransactionId`), payment id.
+
 ### Track token
 32 random hex characters stored on every order. Holding it is proof enough to
 read the order, so it travels in the tracking link and is never rendered as
@@ -276,15 +284,16 @@ and state manually.
 Listed so nobody quietly invents a meaning for them mid-feature. When any of these
 becomes real, define it here in the same session:
 
-**payment, transaction, paid** — no money moves yet. Razorpay is chosen but not
-wired; an order is only ever *recorded*, never *paid*. Don't write copy or code
-that claims otherwise until `PAYMENTS_LIVE` is true.
+**paid** — only ever from PhonePe's status API (ADR 0007), or an admin's
+"mark paid". A buyer returning from PhonePe, or a webhook body, is not proof
+of payment on its own. Until the production keys are on, payments are sandbox.
 
 **customer, account, order history** — orders are stored, buyers are not. There
 is no auth and no way to list "my orders". One order, one link.
 
 **shipment** — we store a courier name and an AWB number on the order, but there
-is no shipment record of our own and nothing is pushed to Shiprocket yet.
+is no shipment record of our own. Paid orders are pushed to Shiprocket, which
+owns the parcel from there.
 
 **customer, account, user** — no auth, no accounts, no user records. The quiz result
 is not a user profile.

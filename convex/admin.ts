@@ -5,7 +5,7 @@ import { mutation, query } from "./_generated/server";
 import type { QueryCtx, MutationCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { appendEvent, queueShiprocketPush } from "./orders";
-import { orderLine, orderStatus, orderTotals, shippingAddress } from "./schema";
+import { orderLine, orderStatus, orderTotals, paymentMethod, shippingAddress } from "./schema";
 import { isAdminEmail } from "./adminAllowlist";
 
 /**
@@ -81,7 +81,9 @@ const adminOrder = v.object({
     v.literal("failed"),
     v.literal("refunded"),
   ),
-  paymentMethod: v.union(v.literal("razorpay"), v.literal("cod")),
+  paymentMethod,
+  phonepeTransactionId: v.optional(v.string()),
+  paymentMode: v.optional(v.string()),
   courier: v.optional(v.string()),
   awb: v.optional(v.string()),
   trackingUrl: v.optional(v.string()),
@@ -130,6 +132,8 @@ export const listOrders = query({
         status: order.status,
         paymentStatus: order.paymentStatus,
         paymentMethod: order.paymentMethod,
+        phonepeTransactionId: order.phonepeTransactionId,
+        paymentMode: order.paymentMode,
         courier: order.courier,
         awb: order.awb,
         trackingUrl: order.trackingUrl,
@@ -196,9 +200,9 @@ const LABELS: Record<string, string> = {
 };
 
 /**
- * Records a payment that arrived outside the gateway — the manual payment-link
- * flow that runs until Razorpay is approved. Razorpay's own webhook will use
- * orders.recordPayment instead, which carries the gateway's ids.
+ * Records a payment that arrived outside the gateway (a bank transfer, say).
+ * PhonePe payments are recorded by orders.recordPayment, from PhonePe's own
+ * status API; nobody needs to press this for them.
  */
 export const markPaid = mutation({
   args: { orderNumber: v.string(), reference: v.optional(v.string()) },

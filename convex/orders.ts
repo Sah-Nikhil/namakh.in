@@ -3,7 +3,7 @@ import { mutation, internalMutation, query } from "./_generated/server";
 import type { MutationCtx } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
-import { orderLine, orderStatus, orderTotals, shippingAddress } from "./schema";
+import { orderLine, orderStatus, orderTotals, paymentMethod, shippingAddress } from "./schema";
 import { getProductBySlug } from "../lib/products";
 import { COMMERCE } from "../lib/commerce/config";
 import { computeTotals, codAvailable, shippingNeedsQuote } from "../lib/commerce/pricing";
@@ -22,7 +22,9 @@ const checkoutDraft = v.object({
   email: v.string(),
   marketingOptIn: v.boolean(),
   address: shippingAddress,
-  paymentMethod: v.union(v.literal("razorpay"), v.literal("cod")),
+  // "razorpay" is still accepted from a storefront deployed before the switch
+  // to PhonePe, and recorded as "phonepe". Drop it once that build is gone.
+  paymentMethod: v.union(v.literal("phonepe"), v.literal("cod"), v.literal("razorpay")),
   notes: v.string(),
 });
 
@@ -34,7 +36,7 @@ const placedOrder = v.object({
   lines: v.array(orderLine),
   address: shippingAddress,
   email: v.string(),
-  paymentMethod: v.union(v.literal("razorpay"), v.literal("cod")),
+  paymentMethod: v.union(v.literal("phonepe"), v.literal("cod")),
   placedAt: v.number(),
 });
 
@@ -129,7 +131,8 @@ export const place = mutation({
       };
     });
 
-    const errors = validateDraft(args.draft);
+    const method: "phonepe" | "cod" = args.draft.paymentMethod === "cod" ? "cod" : "phonepe";
+    const errors = validateDraft({ ...args.draft, paymentMethod: method });
     if (hasErrors(errors)) throw new Error("Check the highlighted fields.");
 
     // Each order emails the address it was placed with, so placement is capped
@@ -144,7 +147,6 @@ export const place = mutation({
     if (!perEmail.ok) throw new Error(tooMany);
 
     const subtotal = lines.reduce((sum, l) => sum + l.price * l.qty, 0);
-    const method: "razorpay" | "cod" = args.draft.paymentMethod === "cod" ? "cod" : "razorpay";
     if (method === "cod" && !codAvailable(subtotal)) {
       throw new Error("Cash on delivery is not available for this order.");
     }
@@ -247,7 +249,7 @@ const trackedOrder = v.object({
     v.literal("failed"),
     v.literal("refunded"),
   ),
-  paymentMethod: v.union(v.literal("razorpay"), v.literal("cod")),
+  paymentMethod,
   placedAt: v.number(),
   lines: v.array(orderLine),
   totals: orderTotals,
@@ -384,33 +386,110 @@ export const recordStatus = internalMutation({
 });
 
 /**
- * Razorpay's success webhook will call this once payments go live. It exists
- * now so the payment leg is a wiring job, not a redesign.
+ * Write what PhonePe's order-status API said about one payment attempt.
+ * Called only from convex/phonepe.ts, after asking PhonePe directly; a
+ * webhook body or a browser redirect is never enough on its own.
+ *
+ * Safe to run any number of times for the same attempt: webhooks repeat,
+ * and the success page, the webhook and the cron can all race.
  */
 export const recordPayment = internalMutation({
   args: {
-    orderNumber: v.string(),
-    razorpayOrderId: v.string(),
-    razorpayPaymentId: v.string(),
+    /** `<orderNumber>-<attempt>`, as sent to PhonePe. */
+    merchantOrderId: v.string(),
+    state: v.union(v.literal("COMPLETED"), v.literal("FAILED")),
+    amountPaise: v.optional(v.number()),
+    phonepeOrderId: v.optional(v.string()),
+    transactionId: v.optional(v.string()),
+    paymentMode: v.optional(v.string()),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
+    const cut = args.merchantOrderId.lastIndexOf("-");
+    const orderNumber = args.merchantOrderId.slice(0, cut);
+    const attempt = Number(args.merchantOrderId.slice(cut + 1));
+
     const order = await ctx.db
       .query("orders")
-      .withIndex("by_orderNumber", (q) => q.eq("orderNumber", args.orderNumber))
+      .withIndex("by_orderNumber", (q) => q.eq("orderNumber", orderNumber))
       .unique();
+    if (!order || !Number.isInteger(attempt) || attempt < 1 || attempt > (order.paymentAttempts ?? 0)) {
+      console.warn(`PhonePe status for unknown attempt ${args.merchantOrderId}.`);
+      return null;
+    }
 
-    if (!order) throw new Error(`No order ${args.orderNumber}.`);
+    if (args.state === "FAILED") {
+      // Only the latest attempt speaks for the order; an old one failing
+      // (expired, abandoned) says nothing about the retry that followed.
+      if (
+        order.paymentStatus === "pending" &&
+        order.phonepeMerchantOrderId === args.merchantOrderId
+      ) {
+        await ctx.db.patch("orders", order._id, { paymentStatus: "failed" });
+      }
+      return null;
+    }
 
+    // COMPLETED. The amount is checked against the order, so a payment for
+    // the wrong total can never confirm it.
+    const expected = Math.round(order.totals.total * 100);
+    if (args.amountPaise !== expected) {
+      console.error(
+        `PhonePe ${args.merchantOrderId} paid ${args.amountPaise} paise, order ${orderNumber} expects ${expected}. Not confirmed; check it in the PhonePe dashboard.`,
+      );
+      return null;
+    }
+
+    const reference = args.transactionId ? `PhonePe ${args.transactionId}` : `PhonePe ${args.merchantOrderId}`;
+
+    if (order.paymentStatus === "paid") {
+      // A second attempt also went through: the buyer has paid twice. Flag it
+      // once on the order so someone refunds it from the PhonePe dashboard.
+      if (args.transactionId && args.transactionId !== order.phonepeTransactionId) {
+        const events = await ctx.db
+          .query("orderEvents")
+          .withIndex("by_orderId", (q) => q.eq("orderId", order._id))
+          .take(100);
+        if (!events.some((e) => e.detail === reference)) {
+          console.error(`Order ${orderNumber} was paid twice; refund ${reference}.`);
+          await appendEvent(
+            ctx,
+            order._id,
+            order.status,
+            "Duplicate payment received. It will be refunded.",
+            "system",
+            reference,
+          );
+        }
+      }
+      return null;
+    }
+
+    // Payment advances only an order that was waiting for it. An order
+    // cancelled before the money arrived stays cancelled, and is refunded.
+    const status = order.status === "awaiting_payment" ? "confirmed" : order.status;
     await ctx.db.patch("orders", order._id, {
-      status: "confirmed",
+      status,
       paymentStatus: "paid",
-      razorpayOrderId: args.razorpayOrderId,
-      razorpayPaymentId: args.razorpayPaymentId,
+      phonepeMerchantOrderId: args.merchantOrderId,
+      phonepeOrderId: args.phonepeOrderId,
+      phonepeTransactionId: args.transactionId,
+      paymentMode: args.paymentMode,
+      paidAt: Date.now(),
     });
+    await appendEvent(
+      ctx,
+      order._id,
+      status,
+      status === "confirmed" ? "Payment received" : "Payment received after cancellation. It will be refunded.",
+      "system",
+      reference,
+    );
 
-    await appendEvent(ctx, order._id, "confirmed", "Payment received", "system");
-    await queueShiprocketPush(ctx, order);
+    if (status === "confirmed") {
+      await queueShiprocketPush(ctx, order);
+      await ctx.scheduler.runAfter(0, internal.emails.orderConfirmed, { orderId: order._id });
+    }
     return null;
   },
 });

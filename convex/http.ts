@@ -86,4 +86,81 @@ http.route({
   }),
 });
 
+/** Hex SHA-256, as PhonePe computes the webhook's Authorization header. */
+async function sha256Hex(text: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+/** Compare without stopping at the first differing character. */
+function sameText(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+/**
+ * PhonePe's payment webhook.
+ *
+ * Set it up in the PhonePe Business dashboard under Developer Settings →
+ * Webhooks, with this deployment's site URL plus /hooks/payment-status, and a
+ * username and password matching PHONEPE_WEBHOOK_USERNAME and
+ * PHONEPE_WEBHOOK_PASSWORD here. PhonePe signs each call with
+ * Authorization: SHA256(username:password).
+ *
+ * The body is treated as a nudge, not as proof: it names the attempt, and
+ * convex/phonepe.ts asks PhonePe's status API what actually happened. That
+ * runs after the response, because PhonePe wants a 2xx within a few seconds.
+ */
+http.route({
+  path: "/hooks/payment-status",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const username = process.env.PHONEPE_WEBHOOK_USERNAME;
+    const password = process.env.PHONEPE_WEBHOOK_PASSWORD;
+    if (!username || !password) {
+      console.error("PHONEPE_WEBHOOK_USERNAME / PHONEPE_WEBHOOK_PASSWORD are not set on this deployment.");
+      return new Response("Not configured", { status: 503 });
+    }
+
+    const expected = await sha256Hex(`${username}:${password}`);
+    const given = (request.headers.get("authorization") ?? "")
+      .trim()
+      .replace(/^sha256\s+/i, "")
+      .toLowerCase();
+    if (!sameText(given, expected)) {
+      return new Response("Unauthorised", { status: 401 });
+    }
+
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return new Response("Malformed body", { status: 400 });
+    }
+    const record = typeof body === "object" && body !== null ? (body as Record<string, unknown>) : {};
+    const event = str(record.event);
+    const payload =
+      typeof record.payload === "object" && record.payload !== null
+        ? (record.payload as Record<string, unknown>)
+        : {};
+    const merchantOrderId = str(payload.merchantOrderId) ?? str(payload.originalMerchantOrderId);
+
+    if (event?.startsWith("checkout.order.") && merchantOrderId) {
+      console.log(`PhonePe ${event} for ${merchantOrderId}; checking status.`);
+      await ctx.scheduler.runAfter(0, internal.phonepe.reconcile, { merchantOrderId });
+    } else if (event?.startsWith("pg.refund.")) {
+      // Refunds are issued from the PhonePe dashboard; nothing here tracks them yet.
+      console.log(`PhonePe ${event} for ${merchantOrderId ?? "unknown order"}.`);
+    } else {
+      // Key names only: enough to recognise a new payload shape, no buyer data.
+      console.warn(
+        `Ignored PhonePe webhook event "${event ?? "none"}" (keys: ${Object.keys(record).join(", ") || "none"}; payload keys: ${Object.keys(payload).join(", ") || "none"}).`,
+      );
+    }
+    return new Response("OK", { status: 200 });
+  }),
+});
+
 export default http;

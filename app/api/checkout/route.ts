@@ -6,6 +6,8 @@ import type { CheckoutDraft } from "@/lib/commerce/types";
 import { orderReceivedEmail } from "@/lib/email/order-received";
 import { sendEmail } from "@/lib/email/send";
 import type { Id } from "@/convex/_generated/dataModel";
+import { PAYMENTS_LIVE } from "@/lib/commerce/config";
+import { paymentReturnUrl, siteOrigin } from "@/lib/site-origin";
 
 type CheckoutRequest = {
   items: { slug: string; qty: number }[];
@@ -21,6 +23,9 @@ type CheckoutRequest = {
  * transaction, from the catalogue — see convex/orders.ts. This route validates
  * early so the buyer gets per-field errors instead of one generic failure, and
  * holds the write secret so the browser never sees it.
+ *
+ * For a prepaid order it then opens the PhonePe payment and returns `payUrl`,
+ * PhonePe's payment page, for the browser to go to (ADR 0007).
  */
 export async function POST(request: Request) {
   let body: CheckoutRequest;
@@ -52,49 +57,53 @@ export async function POST(request: Request) {
         email: draft.email,
         marketingOptIn: draft.marketingOptIn,
         address: draft.address,
-        paymentMethod: draft.paymentMethod === "cod" ? "cod" : "razorpay",
+        paymentMethod: draft.paymentMethod === "cod" ? "cod" : "phonepe",
         notes: draft.notes ?? "",
       },
       ...(quoteId ? { quoteId: quoteId as Id<"shippingQuotes"> } : {}),
     });
 
-    // ---------------------------------------------------------------------
-    // Razorpay handoff goes here, and nowhere else.
-    //
-    // The order is now saved with status "awaiting_payment". When keys land:
-    //
-    //   const rzp = new Razorpay({ key_id: process.env.RAZORPAY_KEY_ID!,
-    //                              key_secret: process.env.RAZORPAY_KEY_SECRET! });
-    //   const rzpOrder = await rzp.orders.create({
-    //     amount: order.totals.total * 100,   // paise
-    //     currency: COMMERCE.currencyCode,
-    //     receipt: order.orderNumber,
-    //   });
-    //
-    // Return rzpOrder.id to the client, open the Razorpay modal against it,
-    // and let Razorpay's webhook call convex/orders.ts:recordPayment — which
-    // already exists — rather than trusting the browser's success callback.
-    // ---------------------------------------------------------------------
+    const origin = siteOrigin(request);
+    const prepaid = PAYMENTS_LIVE && order.paymentMethod === "phonepe";
 
-    // Sent after the response, so a slow mail provider can't cost a saved order
-    // its 201 (the buyer would see an error and order again). On Vercel,
-    // after() keeps the function alive until the send finishes.
-    const origin = (process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin).replace(
-      /\/+$/,
-      "",
-    );
-    after(async () => {
-      try {
-        await sendEmail(
-          { to: order.email, ...orderReceivedEmail(order, origin) },
-          `order-received/${order.orderNumber}`,
-        );
-      } catch (error) {
-        console.error("Order email could not be built", error);
-      }
-    });
+    // A prepaid order is emailed by Convex once PhonePe confirms the payment
+    // (convex/emails.ts), so an abandoned payment never gets "order received".
+    // Everything else is emailed now. Sent after the response, so a slow mail
+    // provider can't cost a saved order its 201 (the buyer would see an error
+    // and order again). On Vercel, after() keeps the function alive until the
+    // send finishes.
+    if (!prepaid) {
+      after(async () => {
+        try {
+          await sendEmail(
+            { to: order.email, ...orderReceivedEmail(order, origin) },
+            `order-received/${order.orderNumber}`,
+          );
+        } catch (error) {
+          console.error("Order email could not be built", error);
+        }
+      });
+      return NextResponse.json(order, { status: 201 });
+    }
 
-    return NextResponse.json(order, { status: 201 });
+    // Open the PhonePe payment. If that fails the order is still saved, and
+    // the confirmation page offers "Pay now" to try again.
+    let payUrl: string | undefined;
+    let payError: string | undefined;
+    try {
+      const started = await convexServerClient().action(api.phonepe.startPayment, {
+        secret: orderWriteSecret(),
+        orderNumber: order.orderNumber,
+        trackToken: order.trackToken,
+        returnUrl: paymentReturnUrl(origin, order.orderNumber),
+      });
+      if (started.kind === "redirect") payUrl = started.url;
+    } catch (error) {
+      console.error(`Payment could not be started for ${order.orderNumber}`, error);
+      payError = readableConvexError(error, "We saved your order but could not open the payment page.");
+    }
+
+    return NextResponse.json({ ...order, payUrl, payError }, { status: 201 });
   } catch (error) {
     console.error("Order placement failed", error);
     return NextResponse.json({ error: readableConvexError(error) }, { status: 502 });

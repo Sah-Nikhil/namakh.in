@@ -60,6 +60,17 @@ export const rateLimiter = new RateLimiter(components.rateLimiter, {
     capacity: 30,
   },
   /**
+   * Calls that reach PhonePe from the storefront (starting a payment,
+   * checking one from the confirmation page). Each needs the order's tracking
+   * token already; this only keeps a loop from hammering PhonePe's API.
+   */
+  paymentCalls: {
+    kind: "token bucket",
+    rate: 120,
+    period: MINUTE,
+    capacity: 120,
+  },
+  /**
    * Footer newsletter sign-ups. Nothing is emailed on sign-up, so the risk is
    * only junk rows in the list; one generous global bucket covers it.
    */

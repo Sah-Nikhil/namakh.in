@@ -17,7 +17,7 @@ export const EMPTY_DRAFT: CheckoutDraft = {
     state: "",
     country: COMMERCE.country,
   },
-  paymentMethod: "razorpay",
+  paymentMethod: "phonepe",
   notes: "",
 };
 

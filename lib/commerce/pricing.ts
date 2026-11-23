@@ -46,7 +46,7 @@ export function shippingNeedsQuote(): boolean {
  */
 export function computeTotals(
   lines: CartLine[],
-  paymentMethod: PaymentMethodId = "razorpay",
+  paymentMethod: PaymentMethodId = "phonepe",
   /** Customer shipping fee from a stored quote. Only read in live mode. */
   quotedShipping?: number,
 ): OrderTotals {

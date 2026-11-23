@@ -25,6 +25,17 @@ export const paymentStatus = v.union(
   v.literal("refunded"),
 );
 
+/**
+ * How the buyer pays. "phonepe" is the live gateway (ADR 0007). "razorpay" is
+ * legacy: test orders placed before PhonePe replaced it still carry it, and
+ * Convex refuses a schema that existing rows do not match. Write "phonepe".
+ */
+export const paymentMethod = v.union(
+  v.literal("phonepe"),
+  v.literal("cod"),
+  v.literal("razorpay"),
+);
+
 export const shippingAddress = v.object({
   fullName: v.string(),
   phone: v.string(),
@@ -79,9 +90,26 @@ export default defineSchema({
 
     status: orderStatus,
     paymentStatus,
-    paymentMethod: v.union(v.literal("razorpay"), v.literal("cod")),
+    paymentMethod,
+    /** Legacy, never written. Kept so old rows still validate. */
     razorpayOrderId: v.optional(v.string()),
     razorpayPaymentId: v.optional(v.string()),
+
+    /**
+     * PhonePe. Each try at paying is its own PhonePe order, named
+     * `<orderNumber>-<attempt>`, because PhonePe refuses a reused id. These
+     * fields describe the latest attempt; the one that succeeded wins.
+     */
+    paymentAttempts: v.optional(v.number()),
+    phonepeMerchantOrderId: v.optional(v.string()),
+    /** PhonePe's own id for that attempt (OMO…). */
+    phonepeOrderId: v.optional(v.string()),
+    /** The transaction that paid. What PhonePe support asks for. */
+    phonepeTransactionId: v.optional(v.string()),
+    /** UPI_INTENT, CARD, NET_BANKING… as PhonePe reports it. */
+    paymentMode: v.optional(v.string()),
+    paymentStartedAt: v.optional(v.number()),
+    paidAt: v.optional(v.number()),
 
     /** Filled in once the parcel is handed to a courier. */
     courier: v.optional(v.string()),
@@ -134,9 +162,9 @@ export default defineSchema({
     expiresAt: v.number(),
   }).index("by_expiresAt", ["expiresAt"]),
 
-  /** Cached API logins. Shiprocket tokens last about ten days. */
+  /** Cached API logins. Shiprocket tokens last about ten days, PhonePe's minutes to hours. */
   integrationTokens: defineTable({
-    provider: v.literal("shiprocket"),
+    provider: v.union(v.literal("shiprocket"), v.literal("phonepe")),
     token: v.string(),
     expiresAt: v.number(),
   }).index("by_provider", ["provider"]),

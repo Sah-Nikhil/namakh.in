@@ -1,35 +1,183 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { IconCheck, IconCopy, IconMail, IconTruck } from "@tabler/icons-react";
+import {
+  IconAlertCircle,
+  IconCheck,
+  IconCopy,
+  IconLoader2,
+  IconLock,
+  IconMail,
+  IconTruck,
+} from "@tabler/icons-react";
 import Navbar from "@/components/navbar";
 import MobileNav from "@/components/mobile-nav";
 import Footer from "@/components/ui/footer-modern";
 import OrderSummary from "@/components/checkout/order-summary";
 import DeliveryWindow from "@/components/checkout/delivery-window";
 import { COMMERCE, LAST_ORDER_KEY, PAYMENTS_LIVE } from "@/lib/commerce/config";
+import { formatINR } from "@/lib/commerce/pricing";
 import { trackingPath } from "@/lib/commerce/tracking";
 import type { PlacedOrder } from "@/lib/commerce/types";
+
+/**
+ * Where a prepaid order stands, as PhonePe reports it.
+ *  offline  — COD, or payments are switched off: nothing to check.
+ *  checking — first question to PhonePe still in flight.
+ *  paid     — confirmed.
+ *  waiting  — PhonePe has not settled it yet (UPI can take a few seconds).
+ *  unpaid   — no payment, a failed one, or one never started.
+ *  error    — we could not reach PhonePe.
+ */
+type Phase = "offline" | "checking" | "paid" | "waiting" | "unpaid" | "error";
+
+/** Re-ask every few seconds while PhonePe says pending, then offer a retry. */
+const POLL_MS = 3000;
+const POLLS_BEFORE_RETRY = 10;
+
+type StatusResult = {
+  paymentStatus?: string;
+  gateway?: "NONE" | "PENDING" | "COMPLETED" | "FAILED" | "UNKNOWN";
+  error?: string;
+};
+
+type PayResult = { kind?: "redirect" | "paid" | "closed"; url?: string; error?: string };
+
+async function paymentRequest<T>(order: PlacedOrder, intent: "status" | "pay"): Promise<T> {
+  const response = await fetch("/api/payment", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ orderNumber: order.orderNumber, token: order.trackToken, intent }),
+  });
+  const result = (await response.json()) as T & { error?: string };
+  if (!response.ok) throw new Error(result.error || "We could not reach the payment service.");
+  return result;
+}
+
+function headline(phase: Phase, stuck: boolean, order: PlacedOrder) {
+  const firstName = order.address.fullName ? `, ${order.address.fullName.split(" ")[0]}` : "";
+  switch (phase) {
+    case "paid":
+      return {
+        kicker: "Payment received",
+        title: `Thank you${firstName}.`,
+        body: "Your payment is confirmed and your order is in our dispatch queue. A confirmation email is on its way.",
+      };
+    case "checking":
+      return {
+        kicker: "Confirming payment",
+        title: "One moment.",
+        body: "Checking your payment with PhonePe.",
+      };
+    case "waiting":
+      return {
+        kicker: "Payment processing",
+        title: "Waiting for PhonePe.",
+        body: stuck
+          ? "PhonePe hasn't confirmed this payment yet. If money left your account, the order confirms itself and we email you, so don't pay twice. If you didn't finish paying, try again."
+          : "This usually takes a few seconds. Please don't pay again or close this page yet.",
+      };
+    case "unpaid":
+      return {
+        kicker: "Payment not completed",
+        title: "Your order is saved, but not paid.",
+        body: "Nothing has been charged. Pay now to confirm it; we only ship paid orders.",
+      };
+    case "error":
+      return {
+        kicker: "Order saved",
+        title: "We couldn't check your payment.",
+        body: "Your order is safe. Check again in a moment. If you paid, the order confirms itself and we email you.",
+      };
+    default:
+      return {
+        kicker: "Order received",
+        title: `Thank you${firstName}.`,
+        body:
+          order.paymentMethod === "cod"
+            ? "Your order is confirmed. You pay the courier when it arrives."
+            : "Your order is saved and waiting for payment. Nothing has been charged yet.",
+      };
+  }
+}
 
 export default function CheckoutSuccessPage() {
   const [order, setOrder] = useState<PlacedOrder | null>(null);
   const [ready, setReady] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [phase, setPhase] = useState<Phase>("offline");
+  const [stuck, setStuck] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [payProblem, setPayProblem] = useState<string | null>(null);
+  const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // The order itself is saved in Convex. This is only the copy the checkout
-  // left behind, so the page renders without a round trip.
-  useEffect(() => {
-    try {
-      const raw = window.sessionStorage.getItem(LAST_ORDER_KEY);
-      if (raw) setOrder(JSON.parse(raw) as PlacedOrder);
-    } catch {
-      setOrder(null);
+  const checkPayment = useCallback(async (placed: PlacedOrder, round: number) => {
+    if (round === 0) {
+      setPhase("checking");
+      setStuck(false);
     }
-    setReady(true);
+    try {
+      const result = await paymentRequest<StatusResult>(placed, "status");
+      if (result.paymentStatus === "paid") return setPhase("paid");
+      if (result.gateway === "NONE" || result.gateway === "FAILED") return setPhase("unpaid");
+
+      setPhase("waiting");
+      if (round + 1 >= POLLS_BEFORE_RETRY) return setStuck(true);
+      pollRef.current = setTimeout(() => void checkPayment(placed, round + 1), POLL_MS);
+    } catch {
+      setPhase("error");
+    }
   }, []);
 
+  // The order itself is saved in Convex. This is the copy the checkout left
+  // behind: it renders the page without a round trip, and carries the
+  // tracking token needed to ask about the payment, across the trip to
+  // PhonePe and back (same tab, so sessionStorage survives it).
+  useEffect(() => {
+    let placed: PlacedOrder | null = null;
+    try {
+      const raw = window.sessionStorage.getItem(LAST_ORDER_KEY);
+      if (raw) placed = JSON.parse(raw) as PlacedOrder;
+    } catch {
+      placed = null;
+    }
+    setOrder(placed);
+    setReady(true);
+    if (placed && PAYMENTS_LIVE && placed.paymentMethod !== "cod") {
+      void checkPayment(placed, 0);
+    }
+    return () => {
+      if (pollRef.current) clearTimeout(pollRef.current);
+    };
+  }, [checkPayment]);
+
+  const payNow = async () => {
+    if (!order) return;
+    if (pollRef.current) clearTimeout(pollRef.current);
+    setPaying(true);
+    setPayProblem(null);
+    try {
+      const result = await paymentRequest<PayResult>(order, "pay");
+      if (result.kind === "redirect" && result.url) {
+        window.location.assign(result.url);
+        return; // leave the spinner on while the page unloads
+      }
+      // Paid after all, or no longer payable: show what the order says now.
+      await checkPayment(order, 0);
+    } catch (error) {
+      setPayProblem(
+        error instanceof Error && error.message
+          ? error.message
+          : "We could not open the payment page. Try again.",
+      );
+    }
+    setPaying(false);
+  };
+
   const trackPath = order ? trackingPath(order.orderNumber, order.trackToken) : "";
+  const confirmed = phase === "paid" || (phase === "offline" && order?.paymentMethod === "cod");
+  const copy = order ? headline(phase, stuck, order) : null;
 
   const copyTrackingLink = async () => {
     try {
@@ -49,7 +197,7 @@ export default function CheckoutSuccessPage() {
       <main className="relative z-[2] mx-auto max-w-4xl px-5 pb-32 pt-28 md:px-10 md:pt-40">
         {!ready ? (
           <div className="h-72 animate-pulse rounded-3xl border border-line bg-ink-2" />
-        ) : !order ? (
+        ) : !order || !copy ? (
           <div className="rounded-3xl border border-line bg-ink-2 px-7 py-14 md:px-12">
             <span className="kicker">/ Order</span>
             <h1 className="display-xl mt-4 text-3xl text-bone md:text-5xl">
@@ -85,22 +233,60 @@ export default function CheckoutSuccessPage() {
           <>
             <header>
               <span className="inline-flex items-center gap-2 rounded-full border border-line bg-ink-2 px-4 py-2">
-                <span className="grid h-5 w-5 place-items-center rounded-full bg-salt">
-                  <IconCheck className="h-3 w-3 text-ink" />
+                <span
+                  className={`grid h-5 w-5 place-items-center rounded-full ${
+                    confirmed || phase === "offline" ? "bg-salt" : "bg-ink-3"
+                  }`}
+                >
+                  {confirmed || phase === "offline" ? (
+                    <IconCheck className="h-3 w-3 text-ink" />
+                  ) : phase === "checking" || phase === "waiting" ? (
+                    <IconLoader2 className="h-3 w-3 animate-spin text-bone-dim" />
+                  ) : (
+                    <IconAlertCircle className="h-3 w-3 text-bone-dim" />
+                  )}
                 </span>
-                <span className="kicker !text-bone-dim">/ Order received</span>
+                <span className="kicker !text-bone-dim">/ {copy.kicker}</span>
               </span>
 
-              <h1 className="display-xl mt-6 text-4xl text-bone md:text-6xl">
-                Thank you
-                {order.address.fullName ? `, ${order.address.fullName.split(" ")[0]}` : ""}.
-              </h1>
+              <h1 className="display-xl mt-6 text-4xl text-bone md:text-6xl">{copy.title}</h1>
 
-              <p className="mt-5 max-w-xl text-lg text-bone-dim">
-                {PAYMENTS_LIVE
-                  ? "Your payment is confirmed and your order is in our dispatch queue."
-                  : "Your order is saved and waiting for payment. Nothing has been charged yet."}
+              <p className="mt-5 max-w-xl text-lg text-bone-dim" aria-live="polite">
+                {copy.body}
               </p>
+
+              {payProblem && (
+                <p className="mt-3 max-w-xl text-sm text-bone-dim" role="alert">
+                  {payProblem}
+                </p>
+              )}
+
+              {(phase === "unpaid" || (phase === "waiting" && stuck)) && (
+                <button
+                  type="button"
+                  onClick={payNow}
+                  disabled={paying}
+                  className="mt-7 inline-flex items-center justify-center gap-2 rounded-full bg-bone px-8 py-3.5 text-sm font-medium text-ink transition-colors hover:bg-salt disabled:opacity-60"
+                >
+                  {paying ? (
+                    <IconLoader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <IconLock className="h-4 w-4" />
+                  )}
+                  {phase === "unpaid" ? "Pay" : "Try paying again"} &middot;{" "}
+                  {formatINR(order.totals.total)}
+                </button>
+              )}
+
+              {phase === "error" && (
+                <button
+                  type="button"
+                  onClick={() => void checkPayment(order, 0)}
+                  className="mt-7 rounded-full border border-line px-8 py-3.5 text-sm text-bone-dim transition-colors hover:border-bone/30 hover:text-bone"
+                >
+                  Check again
+                </button>
+              )}
 
               <dl className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-3">
                 <div className="bg-ink p-5">
@@ -110,7 +296,7 @@ export default function CheckoutSuccessPage() {
                 <div className="bg-ink p-5">
                   <dt className="text-xs text-bone-faint">Status</dt>
                   <dd className="mt-1 font-mono-jb text-sm text-bone">
-                    {order.status === "awaiting_payment" ? "Awaiting payment" : "Confirmed"}
+                    {confirmed ? "Confirmed" : "Awaiting payment"}
                   </dd>
                 </div>
                 <div className="bg-ink p-5">

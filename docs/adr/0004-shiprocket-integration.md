@@ -90,6 +90,17 @@ Shiprocket rejects webhook URLs containing "shiprocket", "kartrocket", "sr" or
 5. One real order watched end to end: quote → place → mark paid → appears in
    Shiprocket → book courier in panel → webhook updates the tracking page.
 
+## Status check, 2026-11-23
+
+- **The account has no pickup address.** Settings → Company Setup → Pick Up
+  Address shows "0 Address". Every push fails with "Please add
+  billing/shipping address first" (orders NMK-HTD5H-AKWY and NMK-HTD5M-MU6M,
+  both sandbox-paid). Add one with the nickname `Warehouse`, exactly the value
+  of `COMMERCE.shiprocket.pickupLocation`, with the Auroville address and its
+  real PIN code; Shiprocket verifies the pickup phone by OTP. Those two are
+  test orders: cancel them in the order panel rather than pressing Retry, or
+  they land in Shiprocket as real shipments.
+
 ## Status check, 2026-10-20
 
 - **Live quotes work.** The API user logs in, and quotes come back with
