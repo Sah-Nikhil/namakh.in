@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import {
   action,
   internalAction,
@@ -259,15 +259,15 @@ export const quote = action({
     assertTrustedCaller(args.secret);
 
     const limit = await rateLimiter.limit(ctx, "shippingQuote");
-    if (!limit.ok) throw new Error("Too many shipping requests. Try again in a minute.");
+    if (!limit.ok) throw new ConvexError("Too many shipping requests. Try again in a minute.");
 
     const pincode = args.pincode.trim();
-    if (!/^[1-9][0-9]{5}$/.test(pincode)) throw new Error("Enter a valid 6-digit PIN code.");
+    if (!/^[1-9][0-9]{5}$/.test(pincode)) throw new ConvexError("Enter a valid 6-digit PIN code.");
 
     // Same catalogue rebuild as order placement: weight and subtotal come from
     // our prices, never from the request.
     const items = args.items.filter((item) => getProductBySlug(item.slug) && item.qty > 0);
-    if (items.length === 0) throw new Error("Your cart is empty.");
+    if (items.length === 0) throw new ConvexError("Your cart is empty.");
     const subtotal = items.reduce(
       (sum, item) => sum + (getProductBySlug(item.slug)?.price ?? 0) * Math.floor(item.qty),
       0,

@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { action, internalAction, internalMutation, internalQuery } from "./_generated/server";
 import type { ActionCtx, MutationCtx } from "./_generated/server";
 import type { Doc } from "./_generated/dataModel";
@@ -541,9 +541,9 @@ export const attemptRefused = internalMutation({
 async function limitCalls(ctx: ActionCtx, orderNumber: string) {
   const busy = "Too many payment requests right now. Try again in a minute.";
   const perOrder = await rateLimiter.limit(ctx, "paymentPerOrder", { key: orderNumber });
-  if (!perOrder.ok) throw new Error(busy);
+  if (!perOrder.ok) throw new ConvexError(busy);
   const global = await rateLimiter.limit(ctx, "paymentCalls");
-  if (!global.ok) throw new Error(busy);
+  if (!global.ok) throw new ConvexError(busy);
 }
 
 async function findOrder(ctx: ActionCtx, orderNumber: string, trackToken: string): Promise<PaymentView> {
@@ -551,7 +551,7 @@ async function findOrder(ctx: ActionCtx, orderNumber: string, trackToken: string
     orderNumber,
     trackToken,
   });
-  if (!order) throw new Error("We could not find that order.");
+  if (!order) throw new ConvexError("We could not find that order.");
   return order;
 }
 
@@ -611,7 +611,7 @@ export const startPayment = action({
     });
     if (reserved.kind === "closed") return { kind: "closed" };
     if (reserved.kind === "limit") {
-      throw new Error("This order has had too many payment attempts. Write to us and we will help.");
+      throw new ConvexError("This order has had too many payment attempts. Write to us and we will help.");
     }
     if (reserved.kind === "open") {
       // Another tab opened one a moment ago.
@@ -640,7 +640,7 @@ export const startPayment = action({
       // The attempt stays open and the cron settles it, so no second one is
       // opened in the meantime.
       console.error(`PhonePe payment ${merchantOrderId} may not have been created`, error);
-      throw new Error("PhonePe is not responding. Give it a few minutes, then try again.");
+      throw new ConvexError("PhonePe is not responding. Give it a few minutes, then try again.");
     }
 
     const body = obj(res.body);
@@ -664,7 +664,7 @@ export const startPayment = action({
     if (res.status >= 400 && res.status < 500 && res.status !== 408 && res.status !== 429) {
       await ctx.runMutation(internal.phonepe.attemptRefused, { merchantOrderId, now: Date.now() });
     }
-    throw new Error("We could not open the payment page. Try again in a moment.");
+    throw new ConvexError("We could not open the payment page. Try again in a moment.");
   },
 });
 

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { ConvexError } from "convex/values";
 import { api } from "@/convex/_generated/api";
 import { convexServerClient, orderWriteSecret } from "@/lib/convex-server";
 import { validateEmail } from "@/lib/commerce/validation";
@@ -26,9 +27,12 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ ok: true });
   } catch (error) {
-    const raw = error instanceof Error ? error.message : "";
-    const limited = raw.match(/Too many sign-ups[^\n]*/);
-    if (limited) return NextResponse.json({ error: limited[0] }, { status: 429 });
+    // Our own messages (bad email, rate limit) arrive as ConvexError; a
+    // production deployment hides the text of any other error.
+    if (error instanceof ConvexError && typeof error.data === "string") {
+      const status = error.data.startsWith("Too many") ? 429 : 400;
+      return NextResponse.json({ error: error.data }, { status });
+    }
     console.error("Newsletter sign-up failed", error);
     return NextResponse.json({ error: "Could not sign you up. Try again." }, { status: 502 });
   }

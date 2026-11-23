@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useMutation } from "convex/react";
+import { ConvexError } from "convex/values";
 import {
   IconChevronDown,
   IconCopy,
@@ -112,9 +113,13 @@ export default function OrderRow({ order }: { order: AdminOrder }) {
     try {
       await action();
     } catch (e) {
-      const message = e instanceof Error ? e.message : "";
-      const match = message.match(/Uncaught Error:\s*([^\n]+)/);
-      setError(match ? match[1].trim() : "That did not go through. Try again.");
+      if (e instanceof ConvexError && typeof e.data === "string") {
+        setError(e.data); // our own message; production hides any other
+      } else {
+        const message = e instanceof Error ? e.message : "";
+        const match = message.match(/Uncaught Error:\s*([^\n]+)/);
+        setError(match ? match[1].trim() : "That did not go through. Try again.");
+      }
     } finally {
       setBusy(null);
     }

@@ -1,4 +1,5 @@
 import { ConvexHttpClient } from "convex/browser";
+import { ConvexError } from "convex/values";
 
 /**
  * Server-side Convex client. Route handlers use this; the browser never talks
@@ -33,6 +34,9 @@ export function readableConvexError(
   error: unknown,
   fallback = "We could not place that order. Try again.",
 ): string {
+  // Messages meant for people are thrown as ConvexError, the only kind a
+  // production deployment passes through; plain errors arrive as "Server Error".
+  if (error instanceof ConvexError && typeof error.data === "string") return error.data;
   const raw = error instanceof Error ? error.message : String(error);
   const match = raw.match(/Uncaught Error:\s*([^\n]+)/);
   if (match) return match[1].trim();

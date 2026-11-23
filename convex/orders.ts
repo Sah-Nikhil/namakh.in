@@ -1,4 +1,4 @@
-import { v, type Infer } from "convex/values";
+import { ConvexError, v, type Infer } from "convex/values";
 import { mutation, internalMutation, query } from "./_generated/server";
 import type { MutationCtx } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
@@ -105,18 +105,18 @@ export const place = mutation({
   handler: async (ctx, args) => {
     assertTrustedCaller(args.secret);
 
-    if (args.items.length === 0) throw new Error("Your cart is empty.");
+    if (args.items.length === 0) throw new ConvexError("Your cart is empty.");
 
     // Rebuild every line from the catalogue. Prices sent by the browser are
     // display state, never trusted input.
     const lines = args.items.map((item) => {
       const product = getProductBySlug(item.slug);
       if (!product) {
-        throw new Error(`We no longer stock "${item.slug}". Remove it and try again.`);
+        throw new ConvexError(`We no longer stock "${item.slug}". Remove it and try again.`);
       }
       const qty = Math.floor(item.qty);
       if (!Number.isFinite(qty) || qty < 1 || qty > COMMERCE.cart.maxQtyPerLine) {
-        throw new Error(
+        throw new ConvexError(
           `Quantity for ${product.name} must be between 1 and ${COMMERCE.cart.maxQtyPerLine}.`,
         );
       }
@@ -133,22 +133,22 @@ export const place = mutation({
 
     const method: "phonepe" | "cod" = args.draft.paymentMethod === "cod" ? "cod" : "phonepe";
     const errors = validateDraft({ ...args.draft, paymentMethod: method });
-    if (hasErrors(errors)) throw new Error("Check the highlighted fields.");
+    if (hasErrors(errors)) throw new ConvexError("Check the highlighted fields.");
 
     // Each order emails the address it was placed with, so placement is capped
     // per address and overall. A rejected order rolls the transaction back, so
     // a failed attempt doesn't spend the buyer's allowance.
     const tooMany = "Too many orders in a short time. Try again in a little while.";
     const global = await rateLimiter.limit(ctx, "checkoutGlobal");
-    if (!global.ok) throw new Error(tooMany);
+    if (!global.ok) throw new ConvexError(tooMany);
     const perEmail = await rateLimiter.limit(ctx, "checkoutPerEmail", {
       key: args.draft.email.trim().toLowerCase(),
     });
-    if (!perEmail.ok) throw new Error(tooMany);
+    if (!perEmail.ok) throw new ConvexError(tooMany);
 
     const subtotal = lines.reduce((sum, l) => sum + l.price * l.qty, 0);
     if (method === "cod" && !codAvailable(subtotal)) {
-      throw new Error("Cash on delivery is not available for this order.");
+      throw new ConvexError("Cash on delivery is not available for this order.");
     }
 
     // Shipping is charged from the stored quote the buyer was shown, never
@@ -158,20 +158,20 @@ export const place = mutation({
     let quotedShipping: number | undefined;
     let quote: Doc<"shippingQuotes"> | null = null;
     if (shippingNeedsQuote()) {
-      if (!args.quoteId) throw new Error("Enter your PIN code so we can work out shipping.");
+      if (!args.quoteId) throw new ConvexError("Enter your PIN code so we can work out shipping.");
       quote = await ctx.db.get("shippingQuotes", args.quoteId);
-      if (!quote) throw new Error("We lost your shipping quote. Check the shipping section and try again.");
+      if (!quote) throw new ConvexError("We lost your shipping quote. Check the shipping section and try again.");
       if (quote.expiresAt < Date.now()) {
-        throw new Error("Your shipping price expired. Check the shipping section and try again.");
+        throw new ConvexError("Your shipping price expired. Check the shipping section and try again.");
       }
       if (quote.pincode !== args.draft.address.pincode.trim()) {
-        throw new Error("Shipping was priced for a different PIN code. Check the shipping section.");
+        throw new ConvexError("Shipping was priced for a different PIN code. Check the shipping section.");
       }
       if (
         quote.weightGrams !== parcelFor(args.items).weightGrams ||
         quote.subtotal !== subtotal
       ) {
-        throw new Error("Your cart changed after shipping was priced. Check the shipping section.");
+        throw new ConvexError("Your cart changed after shipping was priced. Check the shipping section.");
       }
       quotedShipping = quote.amount;
     }

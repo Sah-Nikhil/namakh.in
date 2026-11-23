@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { paginationOptsValidator, paginationResultValidator } from "convex/server";
 import { getAuthSessionId, getAuthUserId } from "@convex-dev/auth/server";
 import { mutation, query } from "./_generated/server";
@@ -49,7 +49,7 @@ async function currentAdminEmail(ctx: QueryCtx | MutationCtx): Promise<string | 
 
 async function requireAdmin(ctx: QueryCtx | MutationCtx): Promise<string> {
   const email = await currentAdminEmail(ctx);
-  if (!email) throw new Error("This account is not allowed to view orders. Sign in again.");
+  if (!email) throw new ConvexError("This account is not allowed to view orders. Sign in again.");
   return email;
 }
 
@@ -214,7 +214,7 @@ export const markPaid = mutation({
       .query("orders")
       .withIndex("by_orderNumber", (q) => q.eq("orderNumber", args.orderNumber))
       .unique();
-    if (!order) throw new Error(`No order ${args.orderNumber}.`);
+    if (!order) throw new ConvexError(`No order ${args.orderNumber}.`);
     if (order.paymentStatus === "paid") return null;
 
     await ctx.db.patch("orders", order._id, {
@@ -253,9 +253,9 @@ export const retryShiprocketPush = mutation({
       .query("orders")
       .withIndex("by_orderNumber", (q) => q.eq("orderNumber", args.orderNumber))
       .unique();
-    if (!order) throw new Error(`No order ${args.orderNumber}.`);
-    if (order.shiprocketPush === "pushed") throw new Error("This order is already in Shiprocket.");
-    if (order.shiprocketPush === "queued") throw new Error("This order is already being sent.");
+    if (!order) throw new ConvexError(`No order ${args.orderNumber}.`);
+    if (order.shiprocketPush === "pushed") throw new ConvexError("This order is already in Shiprocket.");
+    if (order.shiprocketPush === "queued") throw new ConvexError("This order is already being sent.");
 
     // Clearing the flag lets queueShiprocketPush take it from the top.
     await ctx.db.patch("orders", order._id, { shiprocketPush: undefined });

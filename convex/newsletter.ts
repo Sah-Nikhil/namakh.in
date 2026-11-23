@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { mutation } from "./_generated/server";
 import type { MutationCtx } from "./_generated/server";
 import { assertTrustedCaller } from "./orders";
@@ -33,10 +33,10 @@ export const subscribe = mutation({
     assertTrustedCaller(args.secret);
 
     const invalid = validateEmail(args.email);
-    if (invalid) throw new Error(invalid);
+    if (invalid) throw new ConvexError(invalid);
 
     const limit = await rateLimiter.limit(ctx, "newsletterGlobal");
-    if (!limit.ok) throw new Error("Too many sign-ups right now. Try again in a minute.");
+    if (!limit.ok) throw new ConvexError("Too many sign-ups right now. Try again in a minute.");
 
     await addSubscriber(ctx, args.email, "footer");
     return null;
