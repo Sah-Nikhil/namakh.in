@@ -103,3 +103,10 @@ ignored.
   both "Order … confirmed" emails delivered via Resend. Both Shiprocket pushes
   failed because the Shiprocket account has no pickup address yet (see
   ADR 0004).
+- Verified on 2026-11-23, live (after deploy `4021665`): the site is indexable;
+  order NMK-HTD6I-LSUR on www.namakh.in got a live Shiprocket quote (₹130),
+  opened PhonePe's production payment page for ₹1,580, and showed "Waiting
+  for PhonePe" when abandoned. The live admin panel signed in by emailed code
+  and cancelled it. The Shiprocket webhook was moved to the production site
+  URL and its test ping passed the token check there. No live payment has
+  been completed yet; the first real order is the remaining end-to-end test.
