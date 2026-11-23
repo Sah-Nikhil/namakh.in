@@ -137,3 +137,10 @@ ignored.
   and cancelled it. The Shiprocket webhook was moved to the production site
   URL and its test ping passed the token check there. No live payment has
   been completed yet; the first real order is the remaining end-to-end test.
+- Found while deploying the retry fix (2026-11-23): Convex production hides
+  the text of plain thrown errors, so on the live site every buyer-facing
+  backend message had shown as a generic failure since launch. Messages for
+  people are now `ConvexError` (commit `e8fb237`). The retry fix (`01a7bbf`)
+  and the ledger backfill were deployed and run on production the same day;
+  the backfill found NMK-HTD7G-8YTJ, paid ₹1,520 and then cancelled in the
+  panel, which needs a refund from the PhonePe dashboard if it was not a test.
