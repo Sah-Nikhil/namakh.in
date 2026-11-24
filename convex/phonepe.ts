@@ -795,8 +795,12 @@ async function ensureLedger(ctx: MutationCtx, order: Doc<"orders">, now: number)
   for (let attempt = 1; attempt <= count; attempt++) {
     const merchantOrderId = `${order.orderNumber}-${attempt}`;
     if (have.has(merchantOrderId)) continue;
+    // Only PhonePe's own transaction id proves this attempt paid. An order
+    // marked paid by hand in the panel still gets its attempts checked.
     const paidWithThis =
-      order.paymentStatus === "paid" && order.phonepeMerchantOrderId === merchantOrderId;
+      order.paymentStatus === "paid" &&
+      order.phonepeMerchantOrderId === merchantOrderId &&
+      !!order.phonepeTransactionId;
     const createdAt =
       attempt === count ? (order.paymentStartedAt ?? order.placedAt) : order.placedAt;
     await ctx.db.insert("paymentAttempts", {
@@ -838,5 +842,29 @@ export const backfillLedger = internalMutation({
       });
     }
     return { scanned: page.page.length, added, done: page.isDone };
+  },
+});
+
+/**
+ * Put an attempt back in the queue so the cron asks PhonePe about it again.
+ * For a row settled on bad evidence, e.g. by an older backfill that trusted
+ * a hand-marked "paid": `pnpm exec convex run --prod phonepe:recheckAttempt
+ * '{"merchantOrderId":"NMK-...-1"}'`.
+ */
+export const recheckAttempt = internalMutation({
+  args: { merchantOrderId: v.string() },
+  returns: v.boolean(),
+  handler: async (ctx, args) => {
+    const row = await ctx.db
+      .query("paymentAttempts")
+      .withIndex("by_merchantOrderId", (q) => q.eq("merchantOrderId", args.merchantOrderId))
+      .unique();
+    if (!row) return false;
+    await ctx.db.patch("paymentAttempts", row._id, {
+      state: "open",
+      resolvedAt: undefined,
+      nextCheckAt: Date.now(),
+    });
+    return true;
   },
 });

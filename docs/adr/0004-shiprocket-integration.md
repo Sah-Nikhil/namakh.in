@@ -97,7 +97,16 @@ Shiprocket rejects webhook URLs containing "shiprocket", "kartrocket", "sr" or
   billing/shipping address first" (orders NMK-HTD5H-AKWY and NMK-HTD5M-MU6M,
   both sandbox-paid). Add one with the nickname `Warehouse`, exactly the value
   of `COMMERCE.shiprocket.pickupLocation`, with the Auroville address and its
-  real PIN code; Shiprocket verifies the pickup phone by OTP. Those two are
+  real PIN code; Shiprocket verifies the pickup phone by OTP.
+  The address from the client (2026-11-24): Namakh, Celebration, Verite
+  Radial, Auroville 605111, landmark "Near Swaram Sound Garden", phone
+  9543990007. Shiprocket's API refused it (422 "Address line 1 should have
+  House no / Flat no / Road no."), also as "Verite Radial Road": line 1 needs
+  an actual number. The client then gave "Building 2" (2026-11-24); the
+  address was added through the API as `Warehouse` (primary, id 157745868),
+  and a throwaway order created against it was accepted and cancelled. Its
+  phone shows as not verified yet; verify it in the panel (OTP to
+  9543990007) before the first courier pickup. Those two are
   test orders: cancel them in the order panel rather than pressing Retry, or
   they land in Shiprocket as real shipments.
 

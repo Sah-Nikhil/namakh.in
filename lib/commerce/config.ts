@@ -71,15 +71,13 @@ export const COMMERCE = {
   shiprocket: {
     /**
      * Must match a pickup address nickname in the Shiprocket panel exactly,
-     * capitalisation included (Settings → Pickup Addresses). Set 2026-10-13:
-     * "Celebration, Verite Radial, Auroville".
+     * capitalisation included (Settings → Pickup Addresses). Added 2026-11-24:
+     * Building 2, Celebration, Verite Radial, Auroville 605111.
      */
     pickupLocation: "Warehouse",
     /**
-     * PIN code of that pickup address; quotes are priced from here. The client
-     * wrote 605111 on the address (Villupuram district, Irumbai area). The
-     * Auroville post office itself is 605101. Must match what is saved in the
-     * Shiprocket panel — PROVISIONAL until confirmed there.
+     * PIN code of that pickup address; quotes are priced from here. Confirmed
+     * by the client and saved in Shiprocket on 2026-11-24.
      */
     pickupPincode: "605111",
     /**

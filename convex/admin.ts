@@ -232,9 +232,12 @@ export const markPaid = mutation({
       args.reference ? `Reference ${args.reference}, recorded by ${email}` : `Recorded by ${email}`,
     );
 
-    // Paid means ready to ship. Re-read so the push sees the patched order.
-    const paid = await ctx.db.get("orders", order._id);
-    if (paid) await queueShiprocketPush(ctx, paid);
+    // Paid means ready to ship, but only for an order that was waiting on
+    // the payment. A cancelled or returned order stays out of Shiprocket.
+    if (order.status === "awaiting_payment") {
+      const paid = await ctx.db.get("orders", order._id);
+      if (paid) await queueShiprocketPush(ctx, paid);
+    }
     return null;
   },
 });
@@ -256,6 +259,12 @@ export const retryShiprocketPush = mutation({
     if (!order) throw new ConvexError(`No order ${args.orderNumber}.`);
     if (order.shiprocketPush === "pushed") throw new ConvexError("This order is already in Shiprocket.");
     if (order.shiprocketPush === "queued") throw new ConvexError("This order is already being sent.");
+    if (order.status === "cancelled" || order.status === "returned") {
+      throw new ConvexError(`This order is ${order.status}; there is nothing to send.`);
+    }
+    if (order.paymentMethod !== "cod" && order.paymentStatus !== "paid") {
+      throw new ConvexError("This order is not paid yet, so it can't be shipped.");
+    }
 
     // Clearing the flag lets queueShiprocketPush take it from the top.
     await ctx.db.patch("orders", order._id, { shiprocketPush: undefined });

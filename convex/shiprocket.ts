@@ -443,6 +443,24 @@ export const pushOrder = internalAction({
     );
     // Something else already took this push, or it was never queued.
     if (!order || order.shiprocketPush !== "queued") return null;
+    // Never create a shipment for an order that must not ship, however the
+    // push was queued.
+    if (order.status === "cancelled" || order.status === "returned") {
+      await ctx.runMutation(internal.shiprocket.recordPushResult, {
+        orderId: args.orderId,
+        outcome: "failed",
+        error: `Not sent: the order is ${order.status}.`,
+      });
+      return null;
+    }
+    if (order.paymentMethod !== "cod" && order.paymentStatus !== "paid") {
+      await ctx.runMutation(internal.shiprocket.recordPushResult, {
+        orderId: args.orderId,
+        outcome: "failed",
+        error: "Not sent: the order is not paid.",
+      });
+      return null;
+    }
 
     const fail = async (error: string) => {
       await ctx.runMutation(internal.shiprocket.recordPushResult, {
